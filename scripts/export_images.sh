@@ -32,6 +32,23 @@ mkdir -p "$bundle_dir/scripts"
 docker save "$frontend_image" "$backend_image" "$database_image" | gzip > "$bundle_dir/ianalytics_images_${image_tag}.tar.gz"
 
 cp compose.yaml .env.example "$bundle_dir/"
+cp docs/leeme_paquete.md "$bundle_dir/leeme.md"
+
+# Contenido actual de la página (si el sitio está corriendo). Solo las tablas de contenido:
+# se excluyen usuarios, contraseñas, tokens, sesiones, mensajes de contacto y tablas internas.
+if docker compose "${env_args[@]}" ps --status running --services 2>/dev/null | grep -qx database; then
+    echo "==> Incluyendo el contenido actual (sin usuarios ni mensajes)"
+    mkdir -p "$bundle_dir/contenido"
+    docker compose "${env_args[@]}" exec -T database sh -c '
+        tables=$(mysql --user=root --password="$MYSQL_ROOT_PASSWORD" -N -e "SHOW TABLES" "$MYSQL_DATABASE" 2>/dev/null \
+            | grep -vE "^(auth_|authtoken_|django_)|^contact_contactmessage$")
+        exec mysqldump --user=root --password="$MYSQL_ROOT_PASSWORD" --single-transaction \
+            --default-character-set=utf8mb4 "$MYSQL_DATABASE" $tables 2>/dev/null' \
+        | gzip > "$bundle_dir/contenido/database.sql.gz"
+    docker compose "${env_args[@]}" exec -T backend tar -czf - -C /app media > "$bundle_dir/contenido/media.tar.gz"
+else
+    echo "==> El sitio no está corriendo: el paquete parte con el contenido inicial"
+fi
 cp scripts/import_images.sh scripts/backup_database.sh scripts/restore_database.sh "$bundle_dir/scripts/"
 
 echo "==> Paquete listo: $bundle_dir"
@@ -43,4 +60,6 @@ En el otro equipo:
   scripts/import_images.sh ianalytics_images_${image_tag}.tar.gz
   cp .env.example .env   # completar claves
   docker compose up -d --no-build
+  scripts/restore_database.sh contenido   # si el paquete trae contenido
+(instrucciones completas en leeme.md)
 EOF

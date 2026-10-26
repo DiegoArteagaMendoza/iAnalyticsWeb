@@ -69,6 +69,7 @@ docker-compose.override.yml
 # Los paquetes de imágenes exportadas van a dist/, ya ignorado más arriba.
 backups/
 
+
 # --- Editores e IDE ---
 # Configuración personal de VS Code (colores de Peacock, etc.)
 .vscode/
@@ -79,6 +80,7 @@ backups/
 
 # --- Claude Code: permisos locales de esta máquina ---
 .claude/settings.local.json
+.claude/settings.json
 
 # --- Sistema operativo ---
 .DS_Store
