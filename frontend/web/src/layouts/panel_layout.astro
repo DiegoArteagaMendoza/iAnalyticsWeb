@@ -1,0 +1,117 @@
+---
+/** Estructura del panel de administración: barra lateral + contenido. */
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/bitter/700.css";
+import "../styles/global.css";
+
+import type { PanelUser } from "../lib/panel_api";
+
+interface Props {
+  title: string;
+  active: "inicio" | "editar" | "usuarios";
+  user: PanelUser;
+  /** Contenido a todo el alto, sin márgenes (editor) */
+  full_bleed?: boolean;
+}
+
+const { title, active, user, full_bleed = false } = Astro.props;
+const navigation = [
+  { key: "inicio", href: "/panel/", label: "Inicio", icon: "⌂" },
+  { key: "editar", href: "/panel/editar", label: "Editar", icon: "✎" },
+  { key: "usuarios", href: "/panel/usuarios", label: "Gestionar usuarios", icon: "👥" },
+] as const;
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} · Panel iAnalytics</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+  </head>
+  <body class="panel_body">
+    <aside class="panel_sidebar" aria-label="Menú del panel">
+      <a class="panel_brand" href="/panel/">
+        <img src="/brand/logo_mark.png" alt="" width="40" height="35" />
+        <span>Panel<br /><small>iAnalytics</small></span>
+      </a>
+      <nav>
+        <ul>
+          {
+            navigation.map((item) => (
+              <li>
+                <a href={item.href} aria-current={item.key === active ? "page" : undefined}>
+                  <span class="icon" aria-hidden="true">{item.icon}</span>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <form method="post" action="/panel/salir">
+              <button type="submit"><span class="icon" aria-hidden="true">⎋</span>Salir</button>
+            </form>
+          </li>
+        </ul>
+      </nav>
+      <div class="panel_user">
+        <span class="avatar" aria-hidden="true">{user.full_name.slice(0, 1).toUpperCase()}</span>
+        <span>
+          <strong>{user.full_name}</strong>
+          <small>{user.is_superuser ? "Superadministrador" : "Administrador"}</small>
+        </span>
+      </div>
+    </aside>
+    <main class:list={["panel_main", { full_bleed }]}>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  .panel_body { margin: 0; min-height: 100vh; display: grid; grid-template-columns: 248px 1fr; background: #eef0ef; color: var(--base); }
+  .panel_sidebar {
+    position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 24px;
+    background: var(--base); color: var(--on_dark); padding: 24px 16px;
+  }
+  .panel_brand { display: flex; align-items: center; gap: 12px; color: var(--paper); text-decoration: none; padding: 0 8px; }
+  .panel_brand img { width: 40px; height: auto; }
+  .panel_brand span { font: 700 1.1rem/1.1 var(--serif); }
+  .panel_brand small { font: 500 0.75rem var(--sans); color: var(--yellow); letter-spacing: 0.08em; text-transform: uppercase; }
+  .panel_sidebar nav { flex: 1; }
+  .panel_sidebar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .panel_sidebar nav a, .panel_sidebar nav button {
+    width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 6px;
+    color: var(--on_dark); text-decoration: none; font: 500 0.95rem var(--sans); background: none; border: 0; cursor: pointer; text-align: left;
+  }
+  .panel_sidebar nav a:hover, .panel_sidebar nav button:hover { background: var(--base_2); color: var(--paper); }
+  .panel_sidebar nav a[aria-current="page"] { background: var(--yellow); color: var(--base); font-weight: 600; }
+  .panel_sidebar .icon { width: 20px; text-align: center; }
+  .panel_sidebar form { margin: 0; }
+  .panel_user { display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid var(--base_2); font-size: 0.85rem; }
+  .panel_user strong { display: block; color: var(--paper); font-weight: 600; word-break: break-all; }
+  .panel_user small { color: #8796a3; }
+  .avatar { flex: 0 0 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; font-weight: 700; }
+  .panel_main { padding: 40px; min-width: 0; }
+  /* Las secciones del panel no usan el espaciado de las secciones del sitio */
+  .panel_main section { padding: 0; }
+  .panel_main.full_bleed { padding: 0; height: 100vh; display: flex; flex-direction: column; }
+  .panel_heading { margin-bottom: 28px; }
+  .panel_heading h1 { font-size: 2rem; margin-bottom: 6px; }
+  .panel_heading p { color: var(--muted); }
+  .panel_main .panel_card { background: var(--paper); border-radius: 10px; padding: 24px; box-shadow: 0 1px 3px rgba(18, 32, 43, 0.08); }
+  @media (max-width: 860px) {
+    .panel_body { grid-template-columns: 1fr; }
+    .panel_sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 12px 16px; gap: 12px; }
+    .panel_sidebar nav { flex: 1 1 100%; order: 3; }
+    .panel_sidebar ul { grid-auto-flow: column; overflow-x: auto; }
+    .panel_sidebar nav a, .panel_sidebar nav button { white-space: nowrap; padding: 8px 10px; }
+    .panel_user { border-top: 0; padding: 0; margin-left: auto; }
+    .panel_main { padding: 24px 16px; }
+    .panel_main.full_bleed { height: auto; min-height: 80vh; }
+  }
+</style>

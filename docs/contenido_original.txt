@@ -1,0 +1,172 @@
+CONTENIDO ORIGINAL - https://ianalytics.cl/
+Título de la página: iAnalytics - IAnalytics
+Extraído el: 2026-10-25
+
+================================================================================
+1. NAVEGACIÓN / ENCABEZADO
+================================================================================
+Logo: IAnalytics
+
+Menú:
+- Home
+- Nosotros
+- Servicios
+    - Aplicaciones a Medida
+    - Asesorías
+    - Visibilidad de Datos
+- Contacto
+
+Teléfono: 42-225 20 35
+
+================================================================================
+2. PORTADA (HOME)
+================================================================================
+Expertos en soluciones Informáticas
+
+Informatic Analytics
+
+Proveemos Soluciones Informáticas De Excelencia
+
+Preocupándonos de establecer lazos con nuestros clientes a largo plazo, en un
+marco de respeto, seriedad y confianza.
+
+Tenemos amplia experiencia en Transformación Digital, Desarrollo de
+Aplicaciones Web y Mobile, Inteligencia de Negocios y todo lo que su empresa
+necesite para el crecimiento de su negocio.
+
+================================================================================
+3. NOSOTROS (QUIÉNES SOMOS)
+================================================================================
+Quienes Somos
+
+Somos una empresa que nace en la ciudad de Chillán, capital de la Región de
+Ñuble.
+
+Proveemos soluciones informáticas de excelencia, preocupándonos de establecer
+lazos con nuestros clientes a largo plazo.
+
+--- Misión ---
+Proporcionar a nuestros clientes compromiso y seriedad para entregarles
+soluciones con altos estándares de calidad. Procuramos con todo el entorno,
+especialmente clientes y colaboradores, relaciones de largo plazo, basadas en
+la confianza y respeto mutuo.
+
+--- Visión ---
+Aspiramos a ser una empresa sólida y en constante crecimiento. Buscamos ser
+referente en nuestra área y cultivamos la colaboración, respeto, seriedad y
+confianza entre clientes y proveedores.
+
+--- Nuestros Valores ---
+- Honestidad: 100%
+- Profesionalismo: 100%
+- Compromiso: 100%
+- Servicio personalizado
+
+================================================================================
+4. SERVICIOS: APLICACIONES A MEDIDA
+================================================================================
+Aplicaciones a Medida
+
+Desarrollamos aplicaciones a medida para nuestros clientes usando diferentes
+lenguajes de programación.
+
+- Desarrollo integral de aplicaciones Web interactivas y seguras.
+- Desarrollos de códigos realizado por profesionales.
+- Equipo experto para el alojamiento de tu proyecto en el servidor adecuado,
+  además de mantención y soporte.
+- Aplicaciones Web con diseño personalizado.
+
+Tecnologías (logos):
+- Angular y Flutter
+- Ionic y Node.js
+- Python y React
+- Spring Boot y Vue.js
+
+================================================================================
+5. SERVICIOS: ASESORÍAS
+================================================================================
+Asesorías
+
+Asesoramos a Empresas de Distintos Rubros
+
+Ayudamos a las distintas empresas a optimizar el uso de sus recursos y
+maximizar sus utilidades.
+
+- Seguridad de la información.
+- Consultoría de Procesos.
+- Flexibilidad para abordar los requerimientos comerciales y de arquitectura TI.
+- Transformación Digital.
+- Consultoría estratégica.
+
+(Imagen: Infraestructura y desarrollo)
+
+================================================================================
+6. SERVICIOS: VISIBILIDAD DE DATOS
+================================================================================
+La importancia de los datos
+
+Mayor Valor y Visibilidad a sus Datos
+
+Nos enfocamos en colaborar con las empresas en darle mayor valor y visibilidad
+a sus datos para transformarlos en información y así lograr ventajas
+competitivas en sus respectivas áreas.
+
+--- Datawarehouse ---
+Diseño y construcción de Datawarehouse.
+
+--- Modelamiento de Datos ---
+Diseño y construcción de modelos de datos relacionales y multidimensionales.
+
+--- Datamart ---
+Diseño y construcción de Datamart.
+
+--- Multiplataformas ---
+Integración en un mismo proyecto de múltiples plataformas de desarrollo.
+
+--- Informes ---
+Diseño y construcción de reportería e informes gerenciales.
+
+--- Data ---
+Data Mining y Data Analytics.
+
+Tecnologías (logos):
+- Teradata
+- SQLServer
+- Qlik
+- PowerBI
+- Oracle
+- MySQL
+- MicroStrategy
+
+================================================================================
+7. CONTACTO
+================================================================================
+¿Cómo encontrarnos?
+
+Información de Contacto
+
+Si tiene alguna duda o consulta no dude en comunicarse con nosotros a través
+de nuestros medios de comunicación o escríbanos un correo.
+
+--- Dirección ---
+Constitución 162 Chillán
+(Google Maps: https://goo.gl/maps/p57mE1qcWAjyYgaTA)
+
+--- Informaciones ---
+E-Mail: contacto@ianalytics.cl
+Teléfono: 42-225 20 35
+
+--- Horario ---
+Lunes a Viernes: 10:00 a 19:00 hrs
+
+(Imagen: Certificado 40 horas, Ministerio del Trabajo y Previsión Social)
+
+================================================================================
+8. PIE DE PÁGINA
+================================================================================
+Logo: Informatic Analytics
+
+Enlaces: Home | Nosotros | Aplicaciones a Medida | Asesorías |
+Visibilidad de Datos | Contacto
+
+© Informatic Analytics 2021 / Global Web Chile

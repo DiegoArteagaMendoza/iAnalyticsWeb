@@ -1,0 +1,125 @@
+---
+import { edit_image, edit_item, edit_section, edit_text } from "../../lib/edit_attrs";
+import { get_ui, type Language } from "../../lib/i18n";
+import type { TechnologiesSection, Technology } from "../../lib/types";
+import SectionHeading from "../common/section_heading.astro";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  technologies: TechnologiesSection;
+  language: Language;
+  editing?: boolean;
+}
+
+const { technologies, language, editing = false } = Astro.props;
+const ui = get_ui(language);
+const groups = [
+  { category: "development" as const, label_field: "development_label", label: technologies.development_label, aria: ui.technologies.development_aria },
+  { category: "data" as const, label_field: "data_label", label: technologies.data_label, aria: ui.technologies.data_aria },
+]
+  .map((group) => ({ ...group, items: technologies.items.filter((item) => item.category === group.category) }))
+  .filter((group) => editing || group.items.length > 0);
+const target = (field: string) => ["technologies_section", null, field] as [string, null, string];
+const chip_attributes = (item: Technology) =>
+  edit_item(editing, "technologies", item.id, { is_published: item.is_published, label: "tecnología" });
+---
+
+<section
+  class:list={["technologies", { is_editing: editing }]}
+  id="tecnologias"
+  aria-labelledby="technologies_title"
+  {...edit_section(editing, "technologies_section", technologies.is_visible, "Tecnologías")}
+>
+  <div class="wrap">
+    <SectionHeading {...technologies} eyebrow_color="green" heading_id="technologies_title" editing={editing} endpoint="technologies_section" />
+  </div>
+
+  {
+    groups.map((group, group_index) => (
+      <div class:list={["marquee", `category_${group.category}`, { reverse: group_index % 2 === 1 }]}>
+        <ul class="marquee_track" aria-label={group.aria}>
+          {group.items.map((item) => (
+            <li class="chip" {...chip_attributes(item)}>
+              <span class="chip_logo" {...edit_image(editing, ["technologies", item.id, "logo"], "Logo")}>
+                {item.logo ? <img src={item.logo} alt="" loading="lazy" /> : <i aria-hidden="true" />}
+              </span>
+              <span {...edit_text(editing, ["technologies", item.id, "name"], { translatable: false, placeholder: "Nombre" })}>{item.name}</span>
+            </li>
+          ))}
+          {/* Copia para el desplazamiento continuo; se oculta a lectores de pantalla y no se usa al editar */}
+          {!editing &&
+            group.items.map((item) => (
+              <li class="chip" aria-hidden="true">
+                {item.logo ? <img src={item.logo} alt="" loading="lazy" /> : <i />}
+                {item.name}
+              </li>
+            ))}
+          {editing && (
+            <li class="chip add_chip">
+              <EditAddButton
+                endpoint="technologies"
+                label={group.category === "development" ? "Tecnología de desarrollo" : "Tecnología de datos"}
+                defaults={{ name: "Nueva tecnología", category: group.category, order: group.items.length }}
+              />
+            </li>
+          )}
+        </ul>
+      </div>
+    ))
+  }
+
+  {
+    groups.length > 0 && (
+      <div class="wrap">
+        <div class="legend">
+          {groups.map(
+            (group) =>
+              (editing || group.label) && (
+                <span class={`category_${group.category}`} {...edit_text(editing, target(group.label_field), { placeholder: "Leyenda" })}>
+                  {group.label}
+                </span>
+              ),
+          )}
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .technologies { background: var(--paper); padding-bottom: 72px; }
+  .category_development { --chip_color: var(--yellow); }
+  .category_data { --chip_color: var(--blue); }
+  .marquee {
+    overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee + .marquee { border-top: 0; }
+  .marquee_track { list-style: none; margin: 0; padding: 0; display: flex; width: max-content; animation: marquee_scroll 40s linear infinite; }
+  .reverse .marquee_track { animation-direction: reverse; }
+  .marquee:hover .marquee_track { animation-play-state: paused; }
+  .chip {
+    padding: 28px 40px; font: 600 1.15rem var(--sans); color: var(--muted); white-space: nowrap;
+    display: flex; align-items: center; gap: 12px; border-right: 1px solid var(--line);
+  }
+  .chip_logo { display: contents; }
+  .chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--chip_color); }
+  .chip img { height: 28px; width: auto; }
+  @keyframes marquee_scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee_track { animation: none; flex-wrap: wrap; width: auto; }
+    .chip[aria-hidden="true"] { display: none; }
+  }
+  /* Al editar: sin animación y en varias filas, para poder hacer clic en cada tecnología */
+  .is_editing .marquee { -webkit-mask: none; mask: none; }
+  .is_editing .marquee_track { animation: none; flex-wrap: wrap; width: auto; padding: 0 24px; }
+  .is_editing .chip_logo { display: inline-flex; min-width: 28px; min-height: 28px; align-items: center; justify-content: center; }
+  .add_chip { padding: 16px 24px; }
+  .add_chip :global(.edit_add_button) { min-height: 0; padding: 10px 14px; }
+  .legend { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 24px; font-size: 0.9rem; color: var(--muted); }
+  .legend span::before {
+    content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: 8px; background: var(--chip_color);
+  }
+</style>

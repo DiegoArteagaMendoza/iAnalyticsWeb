@@ -1,0 +1,47 @@
+---
+import { switch_language_path } from "../../lib/i18n";
+
+interface Props {
+  message: string;
+  action_label: string;
+  close_label: string;
+}
+
+const { message, action_label, close_label } = Astro.props;
+---
+
+<div class="translation_notice" id="translation_notice" role="status" hidden>
+  <span>{message}</span>
+  <a href={switch_language_path("es")} lang="es">{action_label}</a>
+  <button type="button" aria-label={close_label}>✕</button>
+</div>
+
+<script>
+  // Aviso de traducción automática: visible 8 segundos, una vez por sesión
+  const notice = document.getElementById("translation_notice");
+  const storage_key = "translation_notice_seen";
+  const already_seen = (() => {
+    try { return sessionStorage.getItem(storage_key) === "1"; } catch { return false; }
+  })();
+  if (notice && !already_seen) {
+    notice.hidden = false;
+    const hide = () => {
+      notice.hidden = true;
+      try { sessionStorage.setItem(storage_key, "1"); } catch { /* almacenamiento no disponible */ }
+    };
+    notice.querySelector("button")?.addEventListener("click", hide);
+    window.setTimeout(hide, 8000);
+  }
+</script>
+
+<style>
+  .translation_notice {
+    position: fixed; left: 16px; bottom: 16px; z-index: 90; max-width: 360px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+    background: var(--base); color: #e4eaee; font-size: 0.85rem; padding: 12px 16px;
+    border-left: 4px solid var(--yellow); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  .translation_notice[hidden] { display: none; }
+  a { color: var(--yellow); font-weight: 600; }
+  button { margin-left: auto; background: none; border: 0; color: #e4eaee; cursor: pointer; font-size: 0.9rem; padding: 0 2px; }
+</style>

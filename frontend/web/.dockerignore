@@ -1,0 +1,10 @@
+# Lo que no debe entrar a la imagen del frontend
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+dockerfile
+.dockerignore

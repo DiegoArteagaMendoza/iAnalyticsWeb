@@ -1,0 +1,121 @@
+/* ===== Tokens ===== */
+:root {
+  /* Base */
+  --base: #12202b; /* azul tinta: fondos oscuros y texto */
+  --base_2: #1b2e3c; /* base elevada */
+  --paper: #ffffff;
+  --surface: #f5f3ec; /* fondo alterno cálido */
+  --line: #dcd8cc;
+  --muted: #5b6670;
+  --on_dark: #c9d3db;
+  /* Acento principal */
+  --yellow: #f2b705;
+  --yellow_dark: #d49e00;
+  --yellow_soft: #fff4cc;
+  /* Toques */
+  --green: #1e8f5e;
+  --green_soft: #ddf1e6;
+  --blue: #1c63a8;
+  --blue_soft: #ddeaf7;
+
+  --serif: "Bitter", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --max_width: 1240px;
+  --ease: 0.3s ease;
+  --header_height: 80px;
+}
+
+/* Colores de acento que llegan desde el backend */
+.accent_yellow { --accent: var(--yellow); }
+.accent_green { --accent: var(--green); }
+.accent_blue { --accent: var(--blue); }
+.accent_base { --accent: var(--base); }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--base);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+.wrap { max-width: var(--max_width); margin: 0 auto; padding: 0 24px; }
+section { padding: 96px 0; }
+@media (max-width: 767px) {
+  section { padding: 64px 0; }
+  .wrap { padding: 0 16px; }
+}
+
+.skip_link {
+  position: absolute; left: 16px; top: -60px; z-index: 200;
+  background: var(--yellow); color: var(--base); padding: 0.6rem 1rem; font-weight: 600;
+}
+.skip_link:focus { top: 16px; }
+
+/* ===== Botones y enlaces ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.875rem 1.5rem; font: 600 1rem var(--sans); text-decoration: none;
+  border: 2px solid transparent; cursor: pointer;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.btn_primary { background: var(--yellow); color: var(--base); }
+.btn_primary:hover { background: var(--yellow_dark); }
+.btn_ghost { border-color: currentColor; background: transparent; }
+.btn_ghost:hover { background: var(--paper); color: var(--base); border-color: var(--paper); }
+.btn_dark { background: var(--base); color: var(--paper); }
+.btn_dark:hover { background: var(--base_2); }
+.btn[disabled] { opacity: 0.7; cursor: wait; }
+.btn:focus-visible, .link:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 3px solid var(--blue); outline-offset: 3px;
+}
+.link {
+  font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--yellow);
+  padding-bottom: 2px; transition: border-color var(--ease);
+}
+.link:hover { border-color: var(--green); }
+.arrow::after { content: "→"; display: inline-block; margin-left: 0.4rem; transition: transform var(--ease); }
+.arrow:hover::after { transform: translateX(4px); }
+
+/* ===== Piezas compartidas entre secciones ===== */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font: 600 0.8rem var(--sans); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--eyebrow_color, var(--yellow)); margin-bottom: 24px;
+}
+.eyebrow::before { content: ""; width: 28px; height: 2px; background: currentColor; }
+
+.sub_heading {
+  font: 600 0.8rem var(--sans); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 20px; display: flex; align-items: center; gap: 16px;
+}
+.sub_heading::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.tag {
+  display: inline-block; align-self: flex-start;
+  font: 600 0.72rem var(--sans); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.6rem; margin-bottom: 20px;
+}
+.tag.accent_yellow { background: var(--yellow_soft); color: #7a5b00; }
+.tag.accent_green { background: var(--green_soft); color: #13603f; }
+.tag.accent_blue, .tag.accent_base { background: var(--blue_soft); color: #154c82; }
+
+/* Aparición al hacer scroll (solo si hay JavaScript) */
+.has_js .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.has_js .reveal.is_visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .has_js .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+.visually_hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

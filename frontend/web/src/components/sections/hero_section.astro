@@ -1,0 +1,179 @@
+---
+import { edit_image, edit_item, edit_link, edit_text } from "../../lib/edit_attrs";
+import type { HeroSection } from "../../lib/types";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  hero: HeroSection;
+  editing?: boolean;
+}
+
+const { hero, editing = false } = Astro.props;
+const background_style = hero.background_image ? `background-image: url("${hero.background_image}")` : undefined;
+const target = (field: string) => ["hero_section", null, field] as [string, null, string];
+const highlight_target = (id: number) => ["hero_highlights", id, "text"] as [string, number, string];
+---
+
+<section
+  class="hero"
+  id="inicio"
+  style={background_style}
+  aria-labelledby="hero_title"
+  {...edit_image(editing, target("background_image"), "Cambiar imagen de fondo")}
+>
+  {!hero.background_image && <canvas id="hero_network" aria-hidden="true"></canvas>}
+  <div class="wrap">
+    {(editing || hero.eyebrow) && <div class="eyebrow" {...edit_text(editing, target("eyebrow"), { placeholder: "Etiqueta" })}>{hero.eyebrow}</div>}
+    <h1 id="hero_title">
+      <span {...edit_text(editing, target("title_line_1"), { placeholder: "Título" })}>{hero.title_line_1}</span>
+      {
+        (editing || hero.title_line_2) && (
+          <span class="title_line_2" {...edit_text(editing, target("title_line_2"), { placeholder: "Segunda línea" })}>{hero.title_line_2}</span>
+        )
+      }
+    </h1>
+    {(editing || hero.lead) && <p class="lead" {...edit_text(editing, target("lead"), { multiline: true, placeholder: "Párrafo" })}>{hero.lead}</p>}
+    <div class="actions">
+      {
+        (editing || hero.primary_cta_text) && (
+          <a
+            class="btn btn_primary arrow"
+            href={hero.primary_cta_url || "#"}
+            {...edit_text(editing, target("primary_cta_text"), { placeholder: "Botón principal" })}
+            {...edit_link(editing, target("primary_cta_url"))}
+          >{hero.primary_cta_text}</a>
+        )
+      }
+      {
+        (editing || hero.secondary_cta_text) && (
+          <a
+            class="btn btn_ghost"
+            href={hero.secondary_cta_url || "#"}
+            {...edit_text(editing, target("secondary_cta_text"), { placeholder: "Botón secundario" })}
+            {...edit_link(editing, target("secondary_cta_url"))}
+          >{hero.secondary_cta_text}</a>
+        )
+      }
+    </div>
+    {
+      (editing || hero.highlights.length > 0) && (
+        <ul class="highlights">
+          {hero.highlights.map((highlight) => (
+            <li
+              class={`accent_${highlight.accent_color}`}
+              {...edit_item(editing, "hero_highlights", highlight.id, { is_published: highlight.is_published, accent_color: highlight.accent_color, label: "etiqueta" })}
+            >
+              <span {...edit_text(editing, highlight_target(highlight.id))}>{highlight.text}</span>
+            </li>
+          ))}
+          {editing && (
+            <li class="add_item">
+              <EditAddButton endpoint="hero_highlights" label="Etiqueta" tone="dark" defaults={{ text_es: "Nueva etiqueta", accent_color: "yellow", order: hero.highlights.length }} />
+            </li>
+          )}
+        </ul>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  // Fondo animado: red de nodos de datos en los colores de la marca
+  const canvas = document.getElementById("hero_network") as HTMLCanvasElement | null;
+  const context = canvas?.getContext("2d");
+  if (canvas && context) {
+    const colors = ["#F2B705", "#1E8F5E", "#1C63A8"];
+    const reduce_motion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    type Point = { x: number; y: number; vx: number; vy: number; color: string; radius: number };
+    let points: Point[] = [];
+    let width = 0;
+    let height = 0;
+    let is_visible = true;
+
+    const resize = () => {
+      const ratio = window.devicePixelRatio || 1;
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const count = Math.min(140, Math.round((width * height) / 16000));
+      points = Array.from({ length: count }, (_, index) => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        color: colors[index % colors.length],
+        radius: Math.random() * 2 + 1.2,
+      }));
+    };
+
+    const draw = () => {
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < points.length; i++) {
+        const point = points[i];
+        if (!reduce_motion) {
+          point.x += point.vx;
+          point.y += point.vy;
+          if (point.x < 0 || point.x > width) point.vx *= -1;
+          if (point.y < 0 || point.y > height) point.vy *= -1;
+        }
+        for (let j = i + 1; j < points.length; j++) {
+          const other = points[j];
+          const distance = Math.hypot(point.x - other.x, point.y - other.y);
+          if (distance < 130) {
+            context.strokeStyle = `rgba(201,211,219,${(1 - distance / 130) * 0.25})`;
+            context.lineWidth = 1;
+            context.beginPath();
+            context.moveTo(point.x, point.y);
+            context.lineTo(other.x, other.y);
+            context.stroke();
+          }
+        }
+        context.fillStyle = point.color;
+        context.beginPath();
+        context.arc(point.x, point.y, point.radius, 0, Math.PI * 2);
+        context.fill();
+      }
+      if (!reduce_motion && is_visible) requestAnimationFrame(draw);
+    };
+
+    // Pausa la animación cuando el hero no está en pantalla
+    new IntersectionObserver(([entry]) => {
+      const was_visible = is_visible;
+      is_visible = entry.isIntersecting;
+      if (is_visible && !was_visible && !reduce_motion) requestAnimationFrame(draw);
+    }).observe(canvas);
+
+    window.addEventListener("resize", () => {
+      resize();
+      if (reduce_motion) draw();
+    });
+    resize();
+    draw();
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative; background: var(--base) center / cover no-repeat; color: var(--paper);
+    padding: 180px 0 120px; overflow: hidden; min-height: 92vh; display: flex; align-items: center;
+  }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.55; }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, var(--base) 30%, rgba(18, 32, 43, 0.4) 70%, rgba(18, 32, 43, 0.1));
+  }
+  .wrap { position: relative; z-index: 2; width: 100%; }
+  h1 { font-size: clamp(2.5rem, 5.5vw, 4.5rem); max-width: 20ch; }
+  .title_line_2 { display: block; color: var(--yellow); }
+  .lead { font-size: clamp(1.05rem, 1.6vw, 1.25rem); max-width: 56ch; color: var(--on_dark); margin: 28px 0 40px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 16px; }
+  .highlights { list-style: none; padding: 0; margin: 56px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .highlights li:not(.add_item) { font-size: 0.85rem; font-weight: 500; padding: 0.4rem 0.9rem; border: 1px solid rgba(255, 255, 255, 0.25); color: #e4eaee; }
+  .highlights li:not(.add_item)::before {
+    content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    margin-right: 8px; vertical-align: middle; background: var(--accent);
+  }
+  .add_item :global(.edit_add_button) { min-height: 0; padding: 0.4rem 0.9rem; width: auto; }
+</style>

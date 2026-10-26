@@ -1,0 +1,126 @@
+---
+import { edit_item, edit_section, edit_text } from "../../lib/edit_attrs";
+import { get_ui, type Language } from "../../lib/i18n";
+import type { DataCapabilitiesSection } from "../../lib/types";
+import SectionHeading from "../common/section_heading.astro";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  data_capabilities: DataCapabilitiesSection;
+  language: Language;
+  editing?: boolean;
+}
+
+const { data_capabilities, language, editing = false } = Astro.props;
+const ui = get_ui(language);
+const total = data_capabilities.items.length;
+const pad = (value: number) => String(value).padStart(2, "0");
+const accents = ["yellow", "green", "blue"];
+---
+
+<section
+  class="data_capabilities"
+  id="datos"
+  aria-labelledby="data_title"
+  {...edit_section(editing, "data_capabilities_section", data_capabilities.is_visible, "Visibilidad de datos")}
+>
+  <div class="wrap">
+    <SectionHeading {...data_capabilities} cta_style="button" heading_id="data_title" editing={editing} endpoint="data_capabilities_section" />
+
+    {
+      (editing || total > 0) && (
+        <div class="carousel reveal" data-carousel>
+          <div class="track" tabindex="0" role="region" aria-label={ui.data.carousel_aria} data-track>
+            {data_capabilities.items.map((item, index) => (
+              <article
+                class={`slide accent_${accents[index % accents.length]}`}
+                {...edit_item(editing, "data_capabilities", item.id, { is_published: item.is_published, label: "capacidad" })}
+              >
+                <div class="number" aria-hidden="true">{pad(index + 1)}</div>
+                <h3 {...edit_text(editing, ["data_capabilities", item.id, "title"], { placeholder: "Título" })}>{item.title}</h3>
+                {(editing || item.description) && (
+                  <p {...edit_text(editing, ["data_capabilities", item.id, "description"], { multiline: true, placeholder: "Descripción" })}>{item.description}</p>
+                )}
+              </article>
+            ))}
+            {editing && (
+              <div class="slide add_slide">
+                <EditAddButton
+                  endpoint="data_capabilities"
+                  label="Capacidad"
+                  tone="dark"
+                  defaults={{ title_es: "Nueva capacidad", description_es: "Descripción de la capacidad.", order: total }}
+                />
+              </div>
+            )}
+          </div>
+          <div class="controls">
+            <div class="counter" aria-hidden="true"><b data-current>01</b> / {pad(total)}</div>
+            <div class="progress" aria-hidden="true"><span data-progress style={`width: ${100 / Math.max(total, 1)}%`} /></div>
+            <div class="buttons">
+              <button class="control" type="button" aria-label={ui.data.previous} data-previous>←</button>
+              <button class="control" type="button" aria-label={ui.data.next} data-next>→</button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-carousel]").forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>("[data-track]")!;
+    const slides = Array.from(track.children) as HTMLElement[];
+    const current = carousel.querySelector<HTMLElement>("[data-current]")!;
+    const progress = carousel.querySelector<HTMLElement>("[data-progress]")!;
+    const step = () => (slides.length > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : track.clientWidth);
+
+    carousel.querySelector("[data-next]")?.addEventListener("click", () => track.scrollBy({ left: step(), behavior: "smooth" }));
+    carousel.querySelector("[data-previous]")?.addEventListener("click", () => track.scrollBy({ left: -step(), behavior: "smooth" }));
+
+    track.addEventListener(
+      "scroll",
+      () => {
+        const at_end = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
+        const index = at_end ? slides.length - 1 : Math.min(slides.length - 1, Math.round(track.scrollLeft / step()));
+        current.textContent = String(index + 1).padStart(2, "0");
+        progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+      },
+      { passive: true },
+    );
+  });
+</script>
+
+<style>
+  .data_capabilities {
+    background: var(--base); color: var(--paper);
+    --title_line_2_color: var(--yellow);
+    --body_color: var(--on_dark);
+  }
+  .track { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
+  .track::-webkit-scrollbar { display: none; }
+  .track:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+  .slide {
+    flex: 0 0 calc((100% - 48px) / 3); scroll-snap-align: start; background: var(--base_2);
+    padding: 36px 32px; min-height: 260px; display: flex; flex-direction: column; border-left: 4px solid var(--accent);
+  }
+  .number { font-family: var(--serif); font-size: 2.75rem; color: rgba(255, 255, 255, 0.18); line-height: 1; margin-bottom: auto; }
+  .slide h3 { font-size: 1.5rem; margin: 24px 0 10px; }
+  .slide p { color: var(--on_dark); font-size: 0.98rem; }
+  .controls { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; }
+  .counter { font: 600 0.95rem var(--sans); letter-spacing: 0.08em; }
+  .counter b { color: var(--yellow); }
+  .progress { flex: 1; height: 2px; background: rgba(255, 255, 255, 0.15); margin: 0 24px; position: relative; }
+  .progress span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--yellow); transition: width 0.3s; }
+  .buttons { display: flex; gap: 8px; }
+  .control {
+    width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.4);
+    background: transparent; color: var(--paper); font-size: 1.1rem; cursor: pointer; transition: all var(--ease);
+  }
+  .add_slide { border-left-color: transparent; padding: 0; justify-content: center; background: transparent; }
+  .add_slide :global(.edit_add_button) { height: 100%; }
+  .control:hover { background: var(--yellow); border-color: var(--yellow); color: var(--base); }
+  @media (max-width: 991px) { .slide { flex-basis: calc((100% - 24px) / 2); } }
+  @media (max-width: 600px) { .slide { flex-basis: 86%; } }
+</style>

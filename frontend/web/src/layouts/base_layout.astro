@@ -1,0 +1,74 @@
+---
+import "@fontsource/bitter/500.css";
+import "@fontsource/bitter/700.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+import "../styles/global.css";
+
+import { home_path, languages, type Language } from "../lib/i18n";
+import type { SiteSettings } from "../lib/types";
+
+interface Props {
+  language: Language;
+  html_lang: string;
+  og_locale: string;
+  site_settings: SiteSettings;
+  title?: string;
+  description?: string;
+  no_index?: boolean;
+}
+
+const { language, html_lang, og_locale, site_settings, title, description, no_index = false } = Astro.props;
+const page_title = title || site_settings.meta_title || site_settings.company_name;
+const page_description = description || site_settings.meta_description;
+const site_url = Astro.site ?? new URL(Astro.url.origin);
+const canonical_url = new URL(home_path(language), site_url);
+const favicon_url = site_settings.favicon || "/favicon.png";
+const share_image = new URL(site_settings.logo_full || "/brand/logo_full.png", site_url);
+---
+
+<!doctype html>
+<html lang={html_lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{page_title}</title>
+    {page_description && <meta name="description" content={page_description} />}
+    {no_index && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical_url} />
+    {languages.map((item) => <link rel="alternate" hreflang={item} href={new URL(home_path(item), site_url)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(home_path("es"), site_url)} />
+    <link rel="icon" type="image/png" href={favicon_url} />
+    <link rel="apple-touch-icon" href={site_settings.logo_mark || "/brand/logo_mark.png"} />
+    <meta name="theme-color" content="#12202b" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={og_locale} />
+    <meta property="og:site_name" content={site_settings.company_name} />
+    <meta property="og:title" content={page_title} />
+    {page_description && <meta property="og:description" content={page_description} />}
+    <meta property="og:url" content={canonical_url} />
+    <meta property="og:image" content={share_image} />
+
+    <script is:inline>document.documentElement.classList.add("has_js");</script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      // Aparición suave de los bloques al entrar en pantalla
+      const observer = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is_visible");
+              observer.unobserve(entry.target);
+            }
+          }),
+        { threshold: 0.12 },
+      );
+      document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+---
+import { languages, switch_language_path, type Language } from "../../lib/i18n";
+
+interface Props {
+  language: Language;
+  label: string;
+  class?: string;
+}
+
+const { language, label, class: class_name } = Astro.props;
+const language_names: Record<Language, string> = { es: "Español", en: "English" };
+---
+
+<nav class:list={["language_switch", class_name]} aria-label={label}>
+  {
+    languages.map((item) => (
+      <a
+        href={switch_language_path(item)}
+        lang={item}
+        hreflang={item}
+        aria-current={item === language ? "true" : undefined}
+        title={language_names[item]}
+      >
+        {item.toUpperCase()}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .language_switch { display: flex; border: 1px solid var(--line); }
+  a {
+    font: 600 0.8rem var(--sans); letter-spacing: 0.06em; padding: 0.45rem 0.6rem;
+    color: var(--muted); text-decoration: none; transition: background var(--ease), color var(--ease);
+  }
+  a:hover { color: var(--base); }
+  a[aria-current="true"] { background: var(--base); color: var(--paper); }
+</style>

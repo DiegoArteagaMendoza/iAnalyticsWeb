@@ -1,0 +1,180 @@
+ANÁLISIS DE DISEÑO - https://www.thoughtworks.com/
+Fecha de análisis: 2026-10-25
+Fuente: HTML de la portada + hojas de estilo del sitio (clientlib-base / clientlib-site).
+Nota: el análisis se basa en el código (estructura, CSS, tokens), no en capturas de pantalla.
+
+================================================================================
+1. ESTRUCTURA GENERAL DE LA PORTADA (orden de secciones)
+================================================================================
+ 1. Header fijo (sticky) con logo, mega-menú, buscador, "Ask Tai" (asistente IA)
+    y selector de país/idioma.
+ 2. Hero a pantalla completa con VIDEO en loop (autoplay, muted) + titular
+    corto en dos líneas:  "We don't just do AI / We do AI that works".
+ 3. Bloque de producto destacado (título + párrafo + 1 CTA):
+    "Meet Thoughtworks' Agentic Development Platform" -> "Explore AI/works™".
+ 4. Bloque de propuesta de valor (título + párrafo + CTA):
+    "Leaders want AI to work by 'next Tuesday'" -> "Explore our capabilities".
+    Mensaje en tríada: "Rebuild. Rewire. Reimagine."
+ 5. Carrusel de tarjetas destacadas (4 ítems, contador 01/04, controles):
+    cada tarjeta tiene una ETIQUETA de tipo (Report, Event, Article) + título.
+ 6. Casos / prueba social: "AI that works in action" + CTA "View client work"
+    + fila de tarjetas con auto-scroll (título + micro-CTA: "Read now",
+    "Learn more", "Get the e-book").
+ 7. Ecosistema de partners: texto + carrusel de logos (AWS, Google Cloud,
+    Azure, Databricks, Snowflake...) + CTA "See our partners".
+ 8. Cita de autoridad (Martin Fowler) -> liderazgo de pensamiento.
+ 9. Bloque de empleo: "Together let's be extraordinary" + CTA a Careers.
+10. CTA final de cierre: "Build differently..." -> "Get in touch".
+11. Footer en columnas: Company / Insights / Site info / Connect with us
+    (redes sociales) + copyright.
+
+Patrón narrativo: Promesa (hero) -> Producto -> Problema/solución ->
+Novedades -> Prueba (casos) -> Credibilidad (partners, cita experta) ->
+Talento -> Llamado a la acción final.
+
+================================================================================
+2. PATRONES DE DISEÑO IDENTIFICADOS
+================================================================================
+2.1 Bloque "Texto + CTA" repetido (componente cmp-text-wcta)
+    - Cada sección empieza con el mismo molde: título en 2 líneas, un párrafo
+      corto (2-3 frases) y UN solo botón/enlace de acción.
+    - Da ritmo y consistencia; el usuario aprende a leer la página rápido.
+
+2.2 Titulares divididos en dos líneas con giro de frase
+    - "We don't just do AI / We do AI that works"
+    - "Partner ecosystems / built on engineering foundations"
+    - "AI that works / in action"
+    - La segunda línea remata o contrasta. Tono directo, con humor
+      ("by 'next Tuesday'", "Faster than you can say 'algorithmic bias'").
+
+2.3 Carruseles como contenedor principal de contenido
+    - Tres tipos: tarjetas destacadas con contador (01/04), tarjetas con
+      auto-scroll horizontal, y carrusel de logos (image tiles).
+    - Controles prev/next/play/pause con estados hover/focus definidos
+      (accesibilidad).
+
+2.4 Tarjetas con etiqueta de tipo de contenido
+    - "Report", "Event", "Article" sobre el título. Ayuda a escanear.
+    - Micro-CTA textual en cada tarjeta ("Read now", "Learn more").
+
+2.5 Mega-menú con descripciones
+    - Cada ítem del menú lleva título + una línea descriptiva
+      (ej. "Technology Radar — An opinionated guide to today's technology
+      landscape"). Cada grupo tiene "Go to overview".
+    - Agrupado por audiencia: qué hacemos, cómo trabajamos, clientes
+      (por industria), insights, carreras, nosotros, contacto.
+
+2.6 Header sticky que se compacta
+    - Al hacer scroll pasa a altura fija de 54px (position: fixed),
+      con transición de 0.2s.
+    - En móvil se convierte en overlay a pantalla completa con fondo blanco.
+
+2.7 Prueba social y autoridad
+    - Reconocimiento de terceros (Gartner Magic Quadrant), encuestas propias
+      (CIO Survey), logos de partners, cita de un referente (Martin Fowler),
+      certificación "Great Place to Work".
+
+2.8 CTA de cierre antes del footer
+    - Una sola frase + botón "Get in touch". Nunca se termina la página sin
+      una acción clara.
+
+2.9 Hero con video de fondo
+    - <video autoplay muted loop playsinline> con imagen "poster" de respaldo
+      (se ve algo aunque el video no cargue).
+
+================================================================================
+3. SISTEMA VISUAL (TOKENS EXTRAÍDOS DEL CSS)
+================================================================================
+3.1 Paleta de colores (por frecuencia de uso)
+    Color principal (acento / marca):
+      #BD4257  rojo-frambuesa  -> botones, hovers, bordes activos, links
+      #9B293C  rojo oscuro     -> hover de botón primario
+      #F2617A  rosa claro      -> estado "active" (al presionar)
+      #E16A7C / #DA576E        -> variantes del acento
+    Neutros:
+      #FFFFFF  blanco          -> fondo principal
+      #000000  negro           -> texto principal y secciones oscuras
+      #163C4D  azul petróleo   -> fondos de sección oscura, bordes
+      #003D4F  azul petróleo profundo
+      #EDF1F3  gris azulado muy claro -> fondos de sección alternos, hovers
+      #D5D9DB  gris borde
+      #71777D  gris texto secundario
+    Acentos secundarios (uso puntual, gráficos/etiquetas):
+      #47A1AD  turquesa
+      #6B9E78  verde
+      #CC850A  mostaza
+      #634F7D  púrpura
+
+    Regla: 1 color de acento fuerte + neutros (blanco/negro/petróleo/gris claro).
+    El acento se reserva para acciones e interacción.
+
+3.2 Tipografía
+    - Titulares: Bitter (serif tipo "slab", Google Fonts).
+    - Cuerpo / UI: Inter (sans-serif, Google Fonts).
+    - Pesos usados: 700 (negrita), 630, 400, 360 (fuente variable, pesos finos).
+    - Letter-spacing: 0 en general; levemente negativo (-0.18 a -0.4px)
+      en titulares grandes.
+    - Escala de tamaños más usada (rem):
+        0.875 | 1 | 1.125 | 1.25 | 1.5 | 1.75 | 2 | 2.5 | 3 | 3.5
+      (14 | 16 | 18 | 20 | 24 | 28 | 32 | 40 | 48 | 56 px)
+    - Contraste serif (titular) + sans (texto) = tono editorial / experto.
+
+3.3 Forma y profundidad
+    - Bordes mayormente RECTOS (border-radius: 0). Solo círculos (50%) en
+      botones de íconos/controles de carrusel.
+    - Sombras muy suaves y escasas:
+        0 3px 6px rgba(0,0,0,.16)
+        0 5px 24px rgba(34,29,31,.12)
+    - Estética plana, limpia, sin degradados llamativos.
+
+3.4 Espaciado y grilla
+    - Grilla de 12 columnas (AEM responsive grid).
+    - Gaps: 16px (1rem) y 24px (1.5rem).
+    - Paddings verticales en múltiplos de 0.25rem (0.5 / 1 / 1.5 / 2 rem).
+    - Ancho máximo de contenido: 1800px (con variantes 1624px, 992px, 960px).
+
+3.5 Breakpoints (mobile-first, min-width)
+      576px | 768px | 992px | 1024px | 1200px | 1440px | 1800px
+
+3.6 Interacción y movimiento
+    - Transiciones cortas: 0.2s-0.4s ease / ease-in-out.
+    - Hover en botones: cambio de color de fondo (acento -> acento oscuro).
+    - Hover en links: subrayado o borde inferior de 1px en color acento.
+    - Estados :focus / :focus-visible definidos (navegación con teclado).
+
+================================================================================
+4. ELEMENTOS IMPORTANTES
+================================================================================
+ - Logo + mega-menú con descripciones por ítem.
+ - Buscador y asistente IA ("Ask Tai") integrados en el header.
+ - Selector de país/idioma (incluye Chile en español: /es-cl).
+ - Hero con video, titular de 2 líneas y mensaje de marca fuerte.
+ - Botones de CTA únicos por sección, con verbos de acción
+   ("Explore", "View", "See", "Get in touch").
+ - Carruseles de contenido y logos con controles accesibles.
+ - Etiquetas de tipo de contenido en tarjetas.
+ - Prueba social: reconocimientos, partners, casos de clientes, citas.
+ - Sección de carreras (marca empleadora).
+ - CTA de contacto antes del footer.
+ - Footer en 4 columnas con enlaces legales, de compliance y redes sociales.
+ - Accesibilidad: declaración de accesibilidad, estados de foco, video muted.
+
+================================================================================
+5. QUÉ SE PUEDE APLICAR A IANALYTICS.CL
+================================================================================
+ - Reemplazar el hero actual por un titular de 2 líneas con giro de frase
+   (ej. "No solo desarrollamos software / Desarrollamos soluciones que
+   funcionan") + un solo CTA ("Conversemos").
+ - Usar el molde "título + párrafo corto + 1 CTA" en cada sección
+   (Nosotros, Aplicaciones a Medida, Asesorías, Visibilidad de Datos).
+ - Paleta: 1 color de acento propio + neutros (blanco, negro/azul oscuro,
+   gris claro alterno para separar secciones).
+ - Tipografía: un par serif para títulos + sans para texto (ej. Bitter + Inter,
+   ambas gratuitas en Google Fonts).
+ - Mostrar los logos de tecnologías (Angular, React, PowerBI, Qlik...) como
+   carrusel o grilla de logos, al estilo de "Partner ecosystems".
+ - Agregar prueba social: casos de clientes, testimonios, certificaciones.
+ - Header fijo que se compacta al hacer scroll; en el menú, una línea de
+   descripción por servicio.
+ - Terminar la página con un CTA de contacto antes del footer.
+ - Footer ordenado en columnas: Empresa / Servicios / Contacto / Redes.

@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/base_layout.astro";
+import { get_page_content } from "../lib/content_api";
+import { get_ui, home_path, language_from_path } from "../lib/i18n";
+
+const language = language_from_path(Astro.url.pathname);
+const ui = get_ui(language);
+const { content } = await get_page_content(language);
+---
+
+<BaseLayout
+  language={language}
+  html_lang={ui.html_lang}
+  og_locale={ui.og_locale}
+  site_settings={content.site_settings}
+  title={`${ui.not_found.title} · ${content.site_settings.company_name}`}
+  no_index
+>
+  <main class="not_found">
+    <div class="wrap">
+      <img src={content.site_settings.logo_mark || "/brand/logo_mark.png"} alt="" width="92" height="80" />
+      <p class="code">404</p>
+      <h1>{ui.not_found.title}</h1>
+      <p>{ui.not_found.body}</p>
+      <a class="btn btn_primary arrow" href={home_path(language)}>{ui.not_found.back}</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .not_found { min-height: 100vh; display: grid; place-items: center; background: var(--base); color: var(--paper); text-align: center; padding: 48px 0; }
+  img { margin: 0 auto 24px; height: 80px; width: auto; }
+  .code { font: 700 0.9rem var(--sans); letter-spacing: 0.2em; color: var(--yellow); margin-bottom: 12px; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 16px; }
+  p:not(.code) { color: var(--on_dark); margin-bottom: 32px; }
+</style>

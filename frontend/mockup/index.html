@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iAnalytics | Soluciones informáticas en Chillán</title>
+<meta name="description" content="iAnalytics: desarrollo de aplicaciones a medida, asesorías TI e inteligencia de negocios desde Chillán, Región de Ñuble.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/logo_mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== Tokens ===== */
+  :root{
+    /* Base */
+    --base:#12202B;        /* azul tinta: color base (fondos oscuros, texto) */
+    --base-2:#1B2E3C;      /* base elevada */
+    --paper:#FFFFFF;
+    --surface:#F5F3EC;     /* fondo alterno cálido */
+    --line:#DCD8CC;
+    --muted:#5B6670;
+    /* Acento principal */
+    --yellow:#F2B705;
+    --yellow-dark:#D49E00;
+    --yellow-soft:#FFF4CC;
+    /* Toques */
+    --green:#1E8F5E;
+    --green-soft:#DDF1E6;
+    --blue:#1C63A8;
+    --blue-soft:#DDEAF7;
+
+    --serif:"Bitter", Georgia, serif;
+    --sans:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --maxw:1240px;
+    --ease:.3s ease;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:72px}
+  body{margin:0;font-family:var(--sans);font-size:1.0625rem;line-height:1.6;color:var(--base);background:var(--paper);-webkit-font-smoothing:antialiased}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.15;margin:0;letter-spacing:-.01em}
+  p{margin:0}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:96px 0}
+  @media (max-width:767px){section{padding:64px 0}.wrap{padding:0 16px}}
+
+  /* ===== Botones / links ===== */
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.875rem 1.5rem;font-weight:600;font-size:1rem;text-decoration:none;border:2px solid transparent;transition:background var(--ease),color var(--ease),border-color var(--ease);cursor:pointer;font-family:var(--sans)}
+  .btn--primary{background:var(--yellow);color:var(--base)}
+  .btn--primary:hover{background:var(--yellow-dark)}
+  .btn--ghost{border-color:currentColor;background:transparent}
+  .btn--ghost:hover{background:var(--paper);color:var(--base);border-color:var(--paper)}
+  .btn--dark{background:var(--base);color:var(--paper)}
+  .btn--dark:hover{background:var(--base-2)}
+  .btn:focus-visible,.link:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+  .link{font-weight:600;text-decoration:none;border-bottom:2px solid var(--yellow);padding-bottom:2px;transition:border-color var(--ease)}
+  .link:hover{border-color:var(--green)}
+  .arrow::after{content:"→";display:inline-block;margin-left:.4rem;transition:transform var(--ease)}
+  .arrow:hover::after{transform:translateX(4px)}
+
+  /* ===== Header ===== */
+  .header{position:fixed;inset:0 0 auto 0;z-index:100;background:var(--paper);color:var(--base);height:80px;border-bottom:1px solid var(--line);transition:height .2s ease-in-out,box-shadow .2s}
+  .header.is-compact{height:64px;box-shadow:0 4px 20px rgba(18,32,43,.12)}
+  .header .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+  .logo-mark{height:46px;width:auto;transition:height .2s ease-in-out}
+  .is-compact .logo-mark{height:38px}
+  .logo-word{height:14px;width:auto}
+  .nav{display:flex;align-items:center;gap:2px}
+  .nav > a,.nav > .has-sub > button{color:var(--base);text-decoration:none;font:500 .95rem var(--sans);padding:.5rem .6rem;background:none;border:0;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+  .nav > a:hover,.nav > .has-sub > button:hover{border-color:var(--yellow)}
+  .has-sub{position:relative}
+  .sub{position:absolute;top:calc(100% + 12px);left:-12px;width:340px;background:var(--paper);color:var(--base);padding:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);opacity:0;visibility:hidden;transform:translateY(-6px);transition:all .2s ease}
+  .has-sub:hover .sub,.has-sub:focus-within .sub{opacity:1;visibility:visible;transform:none}
+  .sub a{display:block;padding:12px;text-decoration:none;border-left:3px solid transparent}
+  .sub a:hover{background:var(--surface);border-color:var(--yellow)}
+  .sub strong{display:block;font-size:.95rem}
+  .sub small{color:var(--muted);font-size:.85rem}
+  .header-cta{display:flex;align-items:center;gap:16px}
+  .phone{font-size:.9rem;color:var(--muted);text-decoration:none;white-space:nowrap}
+  .phone:hover{color:var(--blue)}
+  @media (max-width:1280px){.phone{display:none}}
+  .burger{display:none;background:none;border:0;color:var(--base);font-size:1.6rem;cursor:pointer;padding:4px 8px}
+  .lang{display:flex;border:1px solid var(--line)}
+  .lang button{font:600 .8rem var(--sans);letter-spacing:.06em;padding:.45rem .6rem;background:transparent;border:0;color:var(--muted);cursor:pointer;transition:background var(--ease),color var(--ease)}
+  .lang button:hover{color:var(--base)}
+  .lang button[aria-pressed="true"]{background:var(--base);color:var(--paper)}
+  .lang--nav{display:none}
+  @media (max-width:600px){
+    .header-cta .lang{display:none}
+    .nav.is-open .lang--nav{display:flex;align-self:flex-start;margin-top:24px}
+    .nav.is-open .lang--nav button{font-size:1rem;padding:.6rem 1rem}
+  }
+  .lang-note{position:fixed;left:16px;bottom:16px;z-index:90;max-width:340px;background:var(--base);color:#E4EAEE;font-size:.85rem;padding:12px 16px;border-left:4px solid var(--yellow);box-shadow:0 8px 24px rgba(0,0,0,.25);display:none}
+  .lang-note.show{display:block}
+  .lang-note button{background:none;border:0;color:var(--yellow);font:600 .85rem var(--sans);cursor:pointer;padding:0;margin-left:6px}
+  @media (max-width:480px){.logo-mark{height:38px}.logo-word{height:11px}}
+  @media (max-width:1100px){
+    .nav,.phone{display:none}
+    .burger{display:block}
+    .nav.is-open{display:flex;position:fixed;inset:64px 0 0 0;background:var(--paper);flex-direction:column;align-items:stretch;padding:24px 16px;gap:0;overflow:auto}
+    .nav.is-open > a,.nav.is-open > .has-sub > button{font-size:1.25rem;padding:1rem 0;border-bottom:1px solid var(--line);text-align:left;width:100%}
+    .nav.is-open .sub{position:static;opacity:1;visibility:visible;transform:none;width:auto;background:transparent;box-shadow:none;padding:0 0 8px}
+    .header .btn--primary{display:none}
+  }
+
+  /* ===== Hero ===== */
+  .hero{position:relative;background:var(--base);color:var(--paper);padding:180px 0 120px;overflow:hidden;min-height:92vh;display:flex;align-items:center}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--base) 30%,rgba(18,32,43,.4) 70%,rgba(18,32,43,.1));pointer-events:none}
+  .hero .wrap{position:relative;z-index:2;width:100%}
+  .eyebrow{display:inline-flex;align-items:center;gap:.5rem;font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-bottom:24px}
+  .eyebrow::before{content:"";width:28px;height:2px;background:currentColor}
+  .hero h1{font-size:clamp(2.5rem,5.5vw,4.5rem);max-width:20ch}
+  .hero h1 .l2{display:block;color:var(--yellow)}
+  .hero p.lead{font-size:clamp(1.05rem,1.6vw,1.25rem);max-width:56ch;color:#C9D3DB;margin:28px 0 40px}
+  .hero .actions{display:flex;flex-wrap:wrap;gap:16px}
+  .hero-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:56px}
+  .pill{font-size:.85rem;font-weight:500;padding:.4rem .9rem;border:1px solid rgba(255,255,255,.25);color:#E4EAEE}
+  .pill i{font-style:normal;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
+
+  /* ===== Bloque Texto + CTA ===== */
+  .tcta{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:end;margin-bottom:56px}
+  .tcta h2{font-size:clamp(2rem,4vw,3rem)}
+  .tcta h2 .l2{display:block;color:var(--muted);font-weight:500}
+  .tcta p{color:var(--muted);margin-bottom:20px;max-width:52ch}
+  @media (max-width:860px){.tcta{grid-template-columns:1fr;gap:20px}}
+
+  /* ===== Nosotros ===== */
+  .about{background:var(--paper)}
+  .about-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+  .mv{padding:40px;background:var(--surface);border-top:4px solid var(--yellow)}
+  .mv:nth-child(2){border-color:var(--green)}
+  .mv h3{font-size:1.5rem;margin-bottom:12px}
+  .mv p{color:var(--muted)}
+  .values{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:24px;border:1px solid var(--line)}
+  .value{padding:28px 24px;border-right:1px solid var(--line)}
+  .value:last-child{border-right:0}
+  .value b{display:block;font-family:var(--serif);font-size:1.2rem;margin-bottom:6px}
+  .value span{font-size:.92rem;color:var(--muted)}
+  .value .dot{width:12px;height:12px;border-radius:50%;margin-bottom:16px}
+  @media (max-width:860px){.about-grid{grid-template-columns:1fr}.values{grid-template-columns:1fr 1fr}.value:nth-child(2){border-right:0}.value:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+  @media (max-width:480px){.mv{padding:28px}}
+
+  /* ===== Servicios ===== */
+  .services{background:var(--paper)}
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .svc{background:var(--surface);padding:36px 32px;display:flex;flex-direction:column;transition:transform var(--ease),box-shadow var(--ease);border-bottom:4px solid transparent}
+  .svc:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(18,32,43,.12);border-color:var(--yellow)}
+  .tag{display:inline-block;align-self:flex-start;font:600 .72rem var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:.3rem .6rem;margin-bottom:20px}
+  .tag--y{background:var(--yellow-soft);color:#7A5B00}
+  .tag--g{background:var(--green-soft);color:#13603F}
+  .tag--b{background:var(--blue-soft);color:#154C82}
+  .svc h3{font-size:1.6rem;margin-bottom:12px}
+  .svc > p{color:var(--muted);margin-bottom:20px}
+  .svc ul{list-style:none;padding:0;margin:0 0 28px;flex:1}
+  .svc li{padding:10px 0 10px 28px;border-top:1px solid var(--line);position:relative;font-size:.95rem}
+  .svc li::before{content:"";position:absolute;left:4px;top:18px;width:10px;height:10px;background:var(--yellow)}
+  .svc:nth-child(2) li::before{background:var(--green)}
+  .svc:nth-child(3) li::before{background:var(--blue)}
+  @media (max-width:991px){.svc-grid{grid-template-columns:1fr}}
+
+  /* ===== Carrusel datos ===== */
+  .data{background:var(--base);color:var(--paper)}
+  .data .tcta h2 .l2{color:var(--yellow)}
+  .data .tcta p{color:#C9D3DB}
+  .carousel{position:relative}
+  .track{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+  .track::-webkit-scrollbar{display:none}
+  .slide{flex:0 0 calc((100% - 48px)/3);scroll-snap-align:start;background:var(--base-2);padding:36px 32px;min-height:260px;display:flex;flex-direction:column;border-left:4px solid var(--yellow)}
+  .slide:nth-child(3n+2){border-color:var(--green)}
+  .slide:nth-child(3n){border-color:var(--blue)}
+  .slide .num{font-family:var(--serif);font-size:2.75rem;color:rgba(255,255,255,.18);line-height:1;margin-bottom:auto}
+  .slide h3{font-size:1.5rem;margin:24px 0 10px}
+  .slide p{color:#C9D3DB;font-size:.98rem}
+  @media (max-width:991px){.slide{flex-basis:calc((100% - 24px)/2)}}
+  @media (max-width:600px){.slide{flex-basis:86%}}
+  .controls{display:flex;align-items:center;justify-content:space-between;margin-top:32px}
+  .counter{font:600 .95rem var(--sans);letter-spacing:.08em}
+  .counter b{color:var(--yellow)}
+  .progress{flex:1;height:2px;background:rgba(255,255,255,.15);margin:0 24px;position:relative}
+  .progress span{position:absolute;left:0;top:0;bottom:0;background:var(--yellow);transition:width .3s}
+  .ctrl{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:transparent;color:var(--paper);font-size:1.1rem;cursor:pointer;transition:all var(--ease)}
+  .ctrl:hover{background:var(--yellow);border-color:var(--yellow);color:var(--base)}
+  .ctrl + .ctrl{margin-left:8px}
+
+  /* ===== Tecnologías (marquee) ===== */
+  .tech{background:var(--paper);padding-bottom:72px}
+  .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);-webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .marquee + .marquee{border-top:0}
+  .marquee-inner{display:flex;width:max-content;animation:scroll 40s linear infinite}
+  .marquee.rev .marquee-inner{animation-direction:reverse}
+  .marquee:hover .marquee-inner{animation-play-state:paused}
+  .chip{padding:28px 40px;font:600 1.15rem var(--sans);color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:12px;border-right:1px solid var(--line)}
+  .chip i{width:10px;height:10px;border-radius:50%;background:var(--yellow)}
+  .marquee.rev .chip i{background:var(--blue)}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion:reduce){.marquee-inner{animation:none;flex-wrap:wrap;width:auto}}
+  .tech-legend{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px;font-size:.9rem;color:var(--muted)}
+  .tech-legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:var(--yellow)}
+  .tech-legend span:last-child::before{background:var(--blue)}
+
+  /* ===== Equipo ===== */
+  .team{background:var(--surface)}
+  .founders{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:48px}
+  .founder{display:grid;grid-template-columns:220px 1fr;background:var(--paper)}
+  .photo{position:relative;background:var(--base);display:grid;place-items:center;overflow:hidden;aspect-ratio:4/5}
+  .photo::before{content:"";position:absolute;inset:auto -20% -30% auto;width:90%;aspect-ratio:1;border-radius:50%;background:var(--accent,var(--yellow));opacity:.9}
+  .photo span{position:relative;font-family:var(--serif);font-weight:700;font-size:3rem;color:var(--paper)}
+  .founder .body{padding:32px;display:flex;flex-direction:column}
+  .role{font:600 .78rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+  .founder h3{font-size:1.6rem;margin-bottom:12px}
+  .founder p{color:var(--muted);font-size:.98rem;margin-bottom:20px;flex:1}
+  .social{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;text-decoration:none;color:var(--blue)}
+  .social b{display:grid;place-items:center;width:28px;height:28px;background:var(--blue);color:#fff;font-size:.75rem}
+  .social:hover{text-decoration:underline}
+  .members{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .member{background:var(--paper);transition:transform var(--ease),box-shadow var(--ease)}
+  .member:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(18,32,43,.12)}
+  .member .photo{aspect-ratio:1}
+  .member .photo span{font-size:2.25rem}
+  .member .body{padding:20px 22px 24px}
+  .member h3{font-size:1.15rem;margin-bottom:4px}
+  .member .role{margin:0;color:var(--muted);letter-spacing:.06em}
+  .sub-h{font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 20px;display:flex;align-items:center;gap:16px}
+  .sub-h::after{content:"";flex:1;height:1px;background:var(--line)}
+  @media (max-width:991px){.founders{grid-template-columns:1fr}.members{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.founder{grid-template-columns:1fr}.founder .photo{aspect-ratio:16/10}.founder .body{padding:24px}.members{gap:16px}.member .body{padding:16px}}
+
+  /* ===== Clientes ===== */
+  .clients{background:var(--surface)}
+  .logos{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:56px}
+  .logo-cell{aspect-ratio:3/2;background:var(--paper);display:grid;place-items:center;padding:20px;transition:background var(--ease)}
+  .logo-cell:hover{background:var(--yellow-soft)}
+  .logo-ph{display:flex;align-items:center;gap:8px;color:#9AA3AA;font:700 1rem var(--sans);filter:grayscale(1);transition:filter var(--ease),color var(--ease)}
+  .logo-ph i{width:22px;height:22px;border-radius:50%;background:var(--accent,var(--yellow))}
+  .logo-cell:hover .logo-ph{filter:none;color:var(--base)}
+  @media (max-width:991px){.logos{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:480px){.logos{grid-template-columns:repeat(2,1fr)}}
+
+  /* ===== Confianza ===== */
+  .trust-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-top:24px}
+  .quote{background:var(--paper);padding:48px 48px 48px 120px;position:relative}
+  .quote::before{content:"“";font-family:var(--serif);font-size:6rem;line-height:1;color:var(--yellow);position:absolute;top:16px;left:40px}
+  .quote blockquote{margin:24px 0 24px;font-family:var(--serif);font-size:1.5rem;line-height:1.4}
+  .quote cite{font-style:normal;color:var(--muted);font-size:.95rem}
+  .badge{background:var(--green);color:var(--paper);padding:48px;display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+  .badge .big{font-family:var(--serif);font-size:4rem;line-height:1;font-weight:700}
+  .badge p{color:#E3F3EA}
+  .placeholder{display:inline-block;align-self:flex-start;font:600 .7rem var(--sans);letter-spacing:.08em;text-transform:uppercase;background:var(--blue-soft);color:#154C82;padding:.25rem .5rem;margin-bottom:8px}
+  @media (max-width:860px){.trust-grid{grid-template-columns:1fr}.quote,.badge{padding:32px}.quote::before{left:24px}}
+
+  /* ===== CTA final ===== */
+  .final{background:var(--yellow);color:var(--base);padding:88px 0}
+  .final .wrap{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+  .final h2{font-size:clamp(2rem,4vw,3rem);max-width:18ch}
+
+  /* ===== Contacto ===== */
+  .contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:64px}
+  .info{display:grid;gap:0}
+  .info div{padding:24px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:140px 1fr;gap:16px}
+  .info div:last-child{border-bottom:1px solid var(--line)}
+  .info dt{font:600 .8rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
+  .info dd{margin:0;font-weight:500}
+  .info a{text-decoration:none;border-bottom:1px solid var(--yellow)}
+  .info a:hover{border-color:var(--green)}
+  form{background:var(--surface);padding:40px;display:grid;gap:18px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  label{display:grid;gap:6px;font-size:.88rem;font-weight:600}
+  input,textarea,select{font:inherit;font-weight:400;padding:.8rem 1rem;border:1px solid var(--line);background:var(--paper);color:var(--base);border-radius:0}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--blue);outline-offset:0;border-color:var(--blue)}
+  textarea{min-height:120px;resize:vertical}
+  .cert{display:flex;align-items:center;gap:16px;margin-top:32px;padding:20px;border:1px solid var(--line)}
+  .cert .ico{flex:0 0 48px;height:48px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-weight:700}
+  .cert p{font-size:.92rem;color:var(--muted)}
+  @media (max-width:900px){.contact-grid{grid-template-columns:1fr;gap:40px}.row{grid-template-columns:1fr}form{padding:28px}.info div{grid-template-columns:1fr;gap:4px}}
+
+  /* ===== Footer ===== */
+  footer{background:var(--base);color:#C9D3DB;padding:72px 0 32px;font-size:.95rem}
+  .foot{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid var(--base-2)}
+  .foot h4{color:var(--paper);font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px}
+  .foot ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  .foot a{text-decoration:none}
+  .foot a:hover{color:var(--yellow)}
+  .foot .logo{display:inline-flex;margin-bottom:20px}
+  .copy{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:24px;font-size:.85rem;color:#8796A3}
+  .bar{height:6px;display:flex}
+  .bar span{flex:1}
+  @media (max-width:860px){.foot{grid-template-columns:1fr 1fr}.foot > div:first-child{grid-column:1/-1}}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header">
+  <div class="wrap">
+    <a href="#home" class="logo" aria-label="Informatic Analytics, inicio">
+      <img class="logo-mark" src="assets/logo_mark.png" alt="" width="183" height="160">
+      <img class="logo-word" src="assets/logo_wordmark.png" alt="Informatic Analytics" width="741" height="40">
+    </a>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <a href="#nosotros">Nosotros</a>
+      <a href="#equipo">Equipo</a>
+      <div class="has-sub">
+        <button aria-haspopup="true">Servicios ▾</button>
+        <div class="sub">
+          <a href="#servicios"><strong>Aplicaciones a Medida</strong><small>Web y mobile, desde el diseño hasta el soporte</small></a>
+          <a href="#servicios"><strong>Asesorías</strong><small>Procesos, seguridad y transformación digital</small></a>
+          <a href="#datos"><strong>Visibilidad de Datos</strong><small>Datawarehouse, BI e informes gerenciales</small></a>
+        </div>
+      </div>
+      <a href="#clientes">Clientes</a>
+      <a href="#tecnologias">Tecnologías</a>
+      <a href="#contacto">Contacto</a>
+      <div class="lang lang--nav" role="group" aria-label="Idioma">
+        <button type="button" data-lang="es" aria-pressed="true" lang="es">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+      </div>
+    </nav>
+    <div class="header-cta">
+      <a class="phone" href="tel:+56422252035">42-225 20 35</a>
+      <div class="lang" role="group" aria-label="Idioma">
+        <button type="button" data-lang="es" aria-pressed="true" lang="es">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+      </div>
+      <a class="btn btn--primary" href="#contacto">Conversemos</a>
+      <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ===== HERO ===== -->
+<section class="hero" id="home">
+  <canvas id="net" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow">Informatic Analytics · Chillán</div>
+    <h1>No solo desarrollamos software. <span class="l2">Creamos soluciones que funcionan.</span></h1>
+    <p class="lead">Transformación digital, aplicaciones web y mobile e inteligencia de negocios para que su empresa crezca, con relaciones de largo plazo basadas en el respeto, la seriedad y la confianza.</p>
+    <div class="actions">
+      <a class="btn btn--primary arrow" href="#contacto">Conversemos</a>
+      <a class="btn btn--ghost" href="#servicios">Ver servicios</a>
+    </div>
+    <div class="hero-pills">
+      <span class="pill"><i style="background:var(--yellow)"></i>Transformación Digital</span>
+      <span class="pill"><i style="background:var(--green)"></i>Aplicaciones Web y Mobile</span>
+      <span class="pill"><i style="background:var(--blue)"></i>Inteligencia de Negocios</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NOSOTROS ===== -->
+<section class="about" id="nosotros">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow" style="color:var(--green)">Quiénes somos</div>
+        <h2>Nacimos en Chillán <span class="l2">para crecer junto a su empresa</span></h2>
+      </div>
+      <div>
+        <p>Somos una empresa de la ciudad de Chillán, capital de la Región de Ñuble. Proveemos soluciones informáticas de excelencia y nos preocupamos de construir lazos de largo plazo con nuestros clientes.</p>
+        <a class="link arrow" href="#contacto">Escríbanos</a>
+      </div>
+    </div>
+    <div class="about-grid reveal">
+      <article class="mv">
+        <h3>Misión</h3>
+        <p>Proporcionar a nuestros clientes compromiso y seriedad para entregarles soluciones con altos estándares de calidad. Procuramos con todo el entorno, especialmente clientes y colaboradores, relaciones de largo plazo, basadas en la confianza y respeto mutuo.</p>
+      </article>
+      <article class="mv">
+        <h3>Visión</h3>
+        <p>Aspiramos a ser una empresa sólida y en constante crecimiento. Buscamos ser referente en nuestra área y cultivamos la colaboración, respeto, seriedad y confianza entre clientes y proveedores.</p>
+      </article>
+    </div>
+    <div class="values reveal" aria-label="Nuestros valores">
+      <div class="value"><div class="dot" style="background:var(--yellow)"></div><b>Honestidad</b><span>Transparencia en cada etapa del proyecto.</span></div>
+      <div class="value"><div class="dot" style="background:var(--green)"></div><b>Profesionalismo</b><span>Equipo experto y procesos rigurosos.</span></div>
+      <div class="value"><div class="dot" style="background:var(--blue)"></div><b>Compromiso</b><span>Nos hacemos cargo hasta el final.</span></div>
+      <div class="value"><div class="dot" style="background:var(--base)"></div><b>Servicio personalizado</b><span>Soluciones pensadas para su negocio.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EQUIPO ===== -->
+<section class="team" id="equipo">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow" style="color:var(--blue)">Nuestro equipo</div>
+        <h2>Las personas detrás <span class="l2">de cada solución</span></h2>
+      </div>
+      <div>
+        <p>Un equipo de profesionales de Ñuble que combina desarrollo de software, consultoría y análisis de datos para acompañar a su empresa en cada etapa.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-h reveal">Fundadores</h3>
+    <div class="founders">
+      <article class="founder reveal">
+        <div class="photo" style="--accent:var(--yellow)"><span>NF</span></div>
+        <div class="body">
+          <span class="placeholder">Foto y datos por definir</span>
+          <div class="role">Cofundador · Gerente General</div>
+          <h3>Nombre Fundador</h3>
+          <p>Breve reseña: formación, años de experiencia y qué lo motivó a fundar iAnalytics. Dos o tres líneas bastan.</p>
+          <a class="social" href="#" aria-label="LinkedIn de Nombre Fundador"><b>in</b>LinkedIn</a>
+        </div>
+      </article>
+      <article class="founder reveal">
+        <div class="photo" style="--accent:var(--green)"><span>NF</span></div>
+        <div class="body">
+          <span class="placeholder">Foto y datos por definir</span>
+          <div class="role">Cofundador · Director de Tecnología</div>
+          <h3>Nombre Fundador</h3>
+          <p>Breve reseña: especialidad técnica, proyectos destacados y su rol en el equipo.</p>
+          <a class="social" href="#" aria-label="LinkedIn de Nombre Fundador"><b>in</b>LinkedIn</a>
+        </div>
+      </article>
+    </div>
+
+    <h3 class="sub-h reveal">Equipo</h3>
+    <div class="members">
+      <article class="member reveal"><div class="photo" style="--accent:var(--blue)"><span>NP</span></div><div class="body"><h3>Nombre Persona</h3><p class="role">Desarrollo Web y Mobile</p></div></article>
+      <article class="member reveal"><div class="photo" style="--accent:var(--yellow)"><span>NP</span></div><div class="body"><h3>Nombre Persona</h3><p class="role">Inteligencia de Negocios</p></div></article>
+      <article class="member reveal"><div class="photo" style="--accent:var(--green)"><span>NP</span></div><div class="body"><h3>Nombre Persona</h3><p class="role">Consultoría TI</p></div></article>
+      <article class="member reveal"><div class="photo" style="--accent:var(--blue)"><span>NP</span></div><div class="body"><h3>Nombre Persona</h3><p class="role">Arquitectura de Datos</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICIOS ===== -->
+<section class="services" id="servicios">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow" style="color:var(--blue)">Servicios</div>
+        <h2>Tecnología a la medida <span class="l2">de cada desafío</span></h2>
+      </div>
+      <div>
+        <p>Desde una aplicación web hasta la estrategia de datos de toda la organización: ayudamos a optimizar el uso de sus recursos y maximizar sus utilidades.</p>
+        <a class="link arrow" href="#contacto">Cuéntenos su proyecto</a>
+      </div>
+    </div>
+    <div class="svc-grid">
+      <article class="svc reveal">
+        <span class="tag tag--y">Desarrollo</span>
+        <h3>Aplicaciones a Medida</h3>
+        <p>Desarrollamos aplicaciones a medida usando diferentes lenguajes de programación.</p>
+        <ul>
+          <li>Desarrollo integral de aplicaciones web interactivas y seguras.</li>
+          <li>Código desarrollado por profesionales.</li>
+          <li>Alojamiento en el servidor adecuado, mantención y soporte.</li>
+          <li>Aplicaciones web con diseño personalizado.</li>
+        </ul>
+        <a class="link arrow" href="#tecnologias">Ver tecnologías</a>
+      </article>
+      <article class="svc reveal">
+        <span class="tag tag--g">Consultoría</span>
+        <h3>Asesorías</h3>
+        <p>Asesoramos a empresas de distintos rubros para optimizar recursos y maximizar utilidades.</p>
+        <ul>
+          <li>Seguridad de la información.</li>
+          <li>Consultoría de procesos.</li>
+          <li>Requerimientos comerciales y de arquitectura TI.</li>
+          <li>Transformación digital.</li>
+          <li>Consultoría estratégica.</li>
+        </ul>
+        <a class="link arrow" href="#contacto">Agendar una asesoría</a>
+      </article>
+      <article class="svc reveal">
+        <span class="tag tag--b">Datos</span>
+        <h3>Visibilidad de Datos</h3>
+        <p>Damos mayor valor y visibilidad a sus datos para transformarlos en información y ventajas competitivas.</p>
+        <ul>
+          <li>Datawarehouse y Datamart.</li>
+          <li>Modelamiento de datos relacional y multidimensional.</li>
+          <li>Reportería e informes gerenciales.</li>
+          <li>Data Mining y Data Analytics.</li>
+        </ul>
+        <a class="link arrow" href="#datos">Explorar capacidades</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DATOS (carrusel) ===== -->
+<section class="data" id="datos">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow">La importancia de los datos</div>
+        <h2>Sus datos ya tienen respuestas. <span class="l2">Nosotros las hacemos visibles.</span></h2>
+      </div>
+      <div>
+        <p>Colaboramos con las empresas para transformar sus datos en información y así lograr ventajas competitivas en sus respectivas áreas.</p>
+        <a class="btn btn--primary arrow" href="#contacto">Hablemos de sus datos</a>
+      </div>
+    </div>
+    <div class="carousel reveal">
+      <div class="track" id="track">
+        <article class="slide"><div class="num">01</div><h3>Datawarehouse</h3><p>Diseño y construcción de Datawarehouse.</p></article>
+        <article class="slide"><div class="num">02</div><h3>Modelamiento de Datos</h3><p>Diseño y construcción de modelos de datos relacionales y multidimensionales.</p></article>
+        <article class="slide"><div class="num">03</div><h3>Datamart</h3><p>Diseño y construcción de Datamart.</p></article>
+        <article class="slide"><div class="num">04</div><h3>Multiplataformas</h3><p>Integración en un mismo proyecto de múltiples plataformas de desarrollo.</p></article>
+        <article class="slide"><div class="num">05</div><h3>Informes</h3><p>Diseño y construcción de reportería e informes gerenciales.</p></article>
+        <article class="slide"><div class="num">06</div><h3>Data Mining &amp; Analytics</h3><p>Descubrimiento de patrones y análisis avanzado de datos.</p></article>
+      </div>
+      <div class="controls">
+        <div class="counter"><b id="cur">01</b> / 06</div>
+        <div class="progress"><span id="bar" style="width:16.6%"></span></div>
+        <div><button class="ctrl" id="prev" aria-label="Anterior">←</button><button class="ctrl" id="next" aria-label="Siguiente">→</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TECNOLOGÍAS ===== -->
+<section class="tech" id="tecnologias">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow" style="color:var(--green)">Tecnologías</div>
+        <h2>Las herramientas correctas <span class="l2">para cada proyecto</span></h2>
+      </div>
+      <div>
+        <p>Trabajamos con frameworks modernos de desarrollo y con las principales plataformas de bases de datos e inteligencia de negocios del mercado.</p>
+      </div>
+    </div>
+  </div>
+  <div class="marquee" aria-label="Tecnologías de desarrollo">
+    <div class="marquee-inner" id="mq1"></div>
+  </div>
+  <div class="marquee rev" aria-label="Tecnologías de datos">
+    <div class="marquee-inner" id="mq2"></div>
+  </div>
+  <div class="wrap">
+    <div class="tech-legend"><span>Desarrollo web y mobile</span><span>Datos e inteligencia de negocios</span></div>
+  </div>
+</section>
+
+<!-- ===== CLIENTES ===== -->
+<section class="clients" id="clientes">
+  <div class="wrap">
+    <div class="tcta reveal">
+      <div>
+        <div class="eyebrow" style="color:var(--green)">Clientes destacados</div>
+        <h2>Empresas que confían <span class="l2">en nuestro trabajo</span></h2>
+      </div>
+      <div>
+        <p>Acompañamos a organizaciones de distintos rubros en su transformación digital y en la gestión de sus datos.</p>
+        <a class="link arrow" href="#contacto">Sea nuestro próximo caso de éxito</a>
+      </div>
+    </div>
+
+    <div class="logos reveal" aria-label="Logos de clientes">
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--yellow)"><i></i>Cliente 1</span></div>
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--green)"><i></i>Cliente 2</span></div>
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--blue)"><i></i>Cliente 3</span></div>
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--yellow)"><i></i>Cliente 4</span></div>
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--green)"><i></i>Cliente 5</span></div>
+      <div class="logo-cell"><span class="logo-ph" style="--accent:var(--blue)"><i></i>Cliente 6</span></div>
+    </div>
+
+    <div class="trust-grid">
+      <figure class="quote reveal" style="margin:0">
+        <span class="placeholder">Espacio para testimonio</span>
+        <blockquote>Aquí irá el testimonio de un cliente sobre el trabajo realizado con iAnalytics.</blockquote>
+        <figcaption><cite>Nombre del cliente · Cargo, Empresa</cite></figcaption>
+      </figure>
+      <div class="badge reveal">
+        <div class="big">40 h</div>
+        <div>
+          <p style="font-weight:600;color:#fff;font-size:1.15rem;margin-bottom:8px">Certificación 40 horas</p>
+          <p>Ministerio del Trabajo y Previsión Social.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA FINAL ===== -->
+<section class="final">
+  <div class="wrap">
+    <h2>Construyamos juntos la próxima etapa de su empresa.</h2>
+    <a class="btn btn--dark arrow" href="#contacto">Póngase en contacto</a>
+  </div>
+</section>
+
+<!-- ===== CONTACTO ===== -->
+<section id="contacto">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="eyebrow" style="color:var(--blue)">¿Cómo encontrarnos?</div>
+        <h2 style="font-size:clamp(2rem,4vw,2.75rem);margin-bottom:16px">Información de contacto</h2>
+        <p style="color:var(--muted);margin-bottom:32px">Si tiene alguna duda o consulta, comuníquese con nosotros por cualquiera de nuestros medios o escríbanos un correo.</p>
+        <dl class="info">
+          <div><dt>Dirección</dt><dd><a href="https://goo.gl/maps/p57mE1qcWAjyYgaTA" target="_blank" rel="noopener">Constitución 162, Chillán</a></dd></div>
+          <div><dt>E-mail</dt><dd><a href="mailto:contacto@ianalytics.cl">contacto@ianalytics.cl</a></dd></div>
+          <div><dt>Teléfono</dt><dd><a href="tel:+56422252035">42-225 20 35</a></dd></div>
+          <div><dt>Horario</dt><dd>Lunes a viernes, 9:00 a 18:00 hrs</dd></div>
+        </dl>
+      </div>
+      <form class="reveal" onsubmit="event.preventDefault();this.querySelector('button').textContent=document.documentElement.lang==='en'?'Thank you! (mockup)':'¡Gracias! (mockup)'">
+        <div class="row">
+          <label>Nombre<input type="text" name="nombre" required></label>
+          <label>Empresa<input type="text" name="empresa"></label>
+        </div>
+        <div class="row">
+          <label>E-mail<input type="email" name="email" required></label>
+          <label>Teléfono<input type="tel" name="telefono"></label>
+        </div>
+        <label>Servicio de interés
+          <select name="servicio">
+            <option>Aplicaciones a Medida</option>
+            <option>Asesorías</option>
+            <option>Visibilidad de Datos</option>
+            <option>Otro</option>
+          </select>
+        </label>
+        <label>Mensaje<textarea name="mensaje"></textarea></label>
+        <div><button class="btn btn--primary arrow" type="submit">Enviar mensaje</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<div class="bar" aria-hidden="true"><span style="background:var(--yellow)"></span><span style="background:var(--green)"></span><span style="background:var(--blue)"></span></div>
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a href="#home" class="logo" aria-label="Informatic Analytics, inicio"><img class="logo-mark" src="assets/logo_mark.png" alt="" width="183" height="160"><img class="logo-word" src="assets/logo_wordmark_light.png" alt="Informatic Analytics" width="741" height="40"></a>
+        <p style="max-width:34ch">Soluciones informáticas de excelencia desde Chillán, Región de Ñuble.</p>
+      </div>
+      <div>
+        <h4>Empresa</h4>
+        <ul><li><a href="#nosotros">Nosotros</a></li><li><a href="#equipo">Equipo</a></li><li><a href="#clientes">Clientes</a></li><li><a href="#tecnologias">Tecnologías</a></li><li><a href="#contacto">Contacto</a></li></ul>
+      </div>
+      <div>
+        <h4>Servicios</h4>
+        <ul><li><a href="#servicios">Aplicaciones a Medida</a></li><li><a href="#servicios">Asesorías</a></li><li><a href="#datos">Visibilidad de Datos</a></li></ul>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul><li><a href="mailto:contacto@ianalytics.cl">contacto@ianalytics.cl</a></li><li><a href="tel:+56422252035">42-225 20 35</a></li><li>Constitución 162, Chillán</li></ul>
+      </div>
+    </div>
+    <div class="copy"><span>© <span id="year">2026</span> Informatic Analytics</span><span>Lunes a viernes, 9:00 a 18:00 hrs</span></div>
+  </div>
+</footer>
+
+<div class="lang-note" id="langNote" role="status">This English version was translated automatically. <button type="button" data-lang="es">Ver en español</button></div>
+
+<script>
+  // ===== Traducción ES / EN =====
+  // En el mockup el diccionario está en la página. En la versión final los textos
+  // en inglés se generarán automáticamente desde el backend al editar cada texto.
+  const EN = {
+    'iAnalytics | Soluciones informáticas en Chillán':'iAnalytics | IT solutions in Chillán, Chile',
+    'iAnalytics: desarrollo de aplicaciones a medida, asesorías TI e inteligencia de negocios desde Chillán, Región de Ñuble.':'iAnalytics: custom software development, IT consulting and business intelligence from Chillán, Ñuble Region, Chile.',
+    // Navegación
+    'Nosotros':'About us','Equipo':'Team','Servicios ▾':'Services ▾','Servicios':'Services','Clientes':'Clients','Tecnologías':'Technologies','Contacto':'Contact','Conversemos':"Let's talk",
+    'Aplicaciones a Medida':'Custom Applications','Web y mobile, desde el diseño hasta el soporte':'Web and mobile, from design to support',
+    'Asesorías':'Consulting','Procesos, seguridad y transformación digital':'Processes, security and digital transformation',
+    'Visibilidad de Datos':'Data Visibility','Datawarehouse, BI e informes gerenciales':'Data warehousing, BI and executive reporting',
+    // Hero
+    'No solo desarrollamos software.':"We don't just build software.",'Creamos soluciones que funcionan.':'We build solutions that work.',
+    'Transformación digital, aplicaciones web y mobile e inteligencia de negocios para que su empresa crezca, con relaciones de largo plazo basadas en el respeto, la seriedad y la confianza.':'Digital transformation, web and mobile applications and business intelligence to help your company grow, through long-term relationships built on respect, reliability and trust.',
+    'Ver servicios':'View services','Transformación Digital':'Digital Transformation','Aplicaciones Web y Mobile':'Web and Mobile Applications','Inteligencia de Negocios':'Business Intelligence',
+    // Nosotros
+    'Quiénes somos':'Who we are','Nacimos en Chillán':'Born in Chillán','para crecer junto a su empresa':'to grow alongside your business',
+    'Somos una empresa de la ciudad de Chillán, capital de la Región de Ñuble. Proveemos soluciones informáticas de excelencia y nos preocupamos de construir lazos de largo plazo con nuestros clientes.':'We are a company from Chillán, capital of the Ñuble Region in Chile. We deliver excellent IT solutions and focus on building long-term relationships with our clients.',
+    'Escríbanos':'Write to us','Misión':'Mission','Visión':'Vision',
+    'Proporcionar a nuestros clientes compromiso y seriedad para entregarles soluciones con altos estándares de calidad. Procuramos con todo el entorno, especialmente clientes y colaboradores, relaciones de largo plazo, basadas en la confianza y respeto mutuo.':'To offer our clients commitment and reliability, delivering solutions that meet high quality standards. We seek long-term relationships with everyone around us, especially clients and team members, based on trust and mutual respect.',
+    'Aspiramos a ser una empresa sólida y en constante crecimiento. Buscamos ser referente en nuestra área y cultivamos la colaboración, respeto, seriedad y confianza entre clientes y proveedores.':'We aspire to be a solid, constantly growing company. We aim to be a benchmark in our field, fostering collaboration, respect, reliability and trust between clients and suppliers.',
+    'Honestidad':'Honesty','Transparencia en cada etapa del proyecto.':'Transparency at every stage of the project.',
+    'Profesionalismo':'Professionalism','Equipo experto y procesos rigurosos.':'An expert team and rigorous processes.',
+    'Compromiso':'Commitment','Nos hacemos cargo hasta el final.':'We see every project through to the end.',
+    'Servicio personalizado':'Personalized service','Soluciones pensadas para su negocio.':'Solutions designed for your business.',
+    // Equipo
+    'Nuestro equipo':'Our team','Las personas detrás':'The people behind','de cada solución':'every solution',
+    'Un equipo de profesionales de Ñuble que combina desarrollo de software, consultoría y análisis de datos para acompañar a su empresa en cada etapa.':'A team of professionals from Ñuble combining software development, consulting and data analytics to support your company at every stage.',
+    'Fundadores':'Founders','Foto y datos por definir':'Photo and details to be defined',
+    'Cofundador · Gerente General':'Co-founder · CEO','Cofundador · Director de Tecnología':'Co-founder · CTO',
+    'Nombre Fundador':'Founder Name','Nombre Persona':'Person Name',
+    'Breve reseña: formación, años de experiencia y qué lo motivó a fundar iAnalytics. Dos o tres líneas bastan.':'Short bio: background, years of experience and what led them to found iAnalytics. Two or three lines are enough.',
+    'Breve reseña: especialidad técnica, proyectos destacados y su rol en el equipo.':'Short bio: technical specialty, key projects and their role on the team.',
+    'Desarrollo Web y Mobile':'Web and Mobile Development','Consultoría TI':'IT Consulting','Arquitectura de Datos':'Data Architecture',
+    // Servicios
+    'Tecnología a la medida':'Technology tailored','de cada desafío':'to every challenge',
+    'Desde una aplicación web hasta la estrategia de datos de toda la organización: ayudamos a optimizar el uso de sus recursos y maximizar sus utilidades.':'From a single web application to an organization-wide data strategy: we help you make the most of your resources and maximize your profits.',
+    'Cuéntenos su proyecto':'Tell us about your project','Desarrollo':'Development','Consultoría':'Consulting','Datos':'Data',
+    'Desarrollamos aplicaciones a medida usando diferentes lenguajes de programación.':'We build custom applications using a range of programming languages.',
+    'Desarrollo integral de aplicaciones web interactivas y seguras.':'End-to-end development of interactive, secure web applications.',
+    'Código desarrollado por profesionales.':'Code written by professionals.',
+    'Alojamiento en el servidor adecuado, mantención y soporte.':'Hosting on the right server, plus maintenance and support.',
+    'Aplicaciones web con diseño personalizado.':'Web applications with custom design.',
+    'Ver tecnologías':'View technologies',
+    'Asesoramos a empresas de distintos rubros para optimizar recursos y maximizar utilidades.':'We advise companies across industries on optimizing resources and maximizing profits.',
+    'Seguridad de la información.':'Information security.','Consultoría de procesos.':'Process consulting.',
+    'Requerimientos comerciales y de arquitectura TI.':'Business requirements and IT architecture.',
+    'Transformación digital.':'Digital transformation.','Consultoría estratégica.':'Strategic consulting.',
+    'Agendar una asesoría':'Book a consultation',
+    'Damos mayor valor y visibilidad a sus datos para transformarlos en información y ventajas competitivas.':'We add value and visibility to your data, turning it into information and competitive advantage.',
+    'Datawarehouse y Datamart.':'Data warehouses and data marts.','Modelamiento de datos relacional y multidimensional.':'Relational and multidimensional data modeling.',
+    'Reportería e informes gerenciales.':'Reporting and executive dashboards.','Data Mining y Data Analytics.':'Data mining and data analytics.',
+    'Explorar capacidades':'Explore capabilities',
+    // Datos
+    'La importancia de los datos':'Why data matters','Sus datos ya tienen respuestas.':'Your data already has the answers.','Nosotros las hacemos visibles.':'We make them visible.',
+    'Colaboramos con las empresas para transformar sus datos en información y así lograr ventajas competitivas en sus respectivas áreas.':'We work with companies to turn their data into information and gain a competitive edge in their fields.',
+    'Hablemos de sus datos':"Let's talk about your data",
+    'Datawarehouse':'Data Warehouse','Diseño y construcción de Datawarehouse.':'Data warehouse design and implementation.',
+    'Modelamiento de Datos':'Data Modeling','Diseño y construcción de modelos de datos relacionales y multidimensionales.':'Design and implementation of relational and multidimensional data models.',
+    'Datamart':'Data Mart','Diseño y construcción de Datamart.':'Data mart design and implementation.',
+    'Multiplataformas':'Multiplatform','Integración en un mismo proyecto de múltiples plataformas de desarrollo.':'Integration of multiple development platforms within a single project.',
+    'Informes':'Reporting','Diseño y construcción de reportería e informes gerenciales.':'Design and implementation of reports and executive dashboards.',
+    'Descubrimiento de patrones y análisis avanzado de datos.':'Pattern discovery and advanced data analysis.',
+    // Tecnologías
+    'Las herramientas correctas':'The right tools','para cada proyecto':'for every project',
+    'Trabajamos con frameworks modernos de desarrollo y con las principales plataformas de bases de datos e inteligencia de negocios del mercado.':'We work with modern development frameworks and the leading database and business intelligence platforms on the market.',
+    'Desarrollo web y mobile':'Web and mobile development','Datos e inteligencia de negocios':'Data and business intelligence',
+    // Clientes
+    'Clientes destacados':'Featured clients','Empresas que confían':'Companies that trust','en nuestro trabajo':'our work',
+    'Acompañamos a organizaciones de distintos rubros en su transformación digital y en la gestión de sus datos.':'We support organizations across industries in their digital transformation and data management.',
+    'Sea nuestro próximo caso de éxito':'Be our next success story',
+    'Cliente 1':'Client 1','Cliente 2':'Client 2','Cliente 3':'Client 3','Cliente 4':'Client 4','Cliente 5':'Client 5','Cliente 6':'Client 6',
+    'Espacio para testimonio':'Testimonial placeholder',
+    'Aquí irá el testimonio de un cliente sobre el trabajo realizado con iAnalytics.':'A client testimonial about working with iAnalytics will go here.',
+    'Nombre del cliente · Cargo, Empresa':'Client name · Role, Company',
+    'Certificación 40 horas':'40-hour workweek certification','Ministerio del Trabajo y Previsión Social.':'Chilean Ministry of Labor and Social Security.',
+    // CTA y contacto
+    'Construyamos juntos la próxima etapa de su empresa.':"Let's build your company's next chapter together.",'Póngase en contacto':'Get in touch',
+    '¿Cómo encontrarnos?':'How to find us','Información de contacto':'Contact information',
+    'Si tiene alguna duda o consulta, comuníquese con nosotros por cualquiera de nuestros medios o escríbanos un correo.':'If you have any questions, reach out through any of our channels or send us an email.',
+    'Dirección':'Address','Teléfono':'Phone','Horario':'Hours','Lunes a viernes, 9:00 a 18:00 hrs':'Monday to Friday, 9:00 a.m. to 6:00 p.m.',
+    'Nombre':'Name','Empresa':'Company','Servicio de interés':'Service of interest','Otro':'Other','Mensaje':'Message','Enviar mensaje':'Send message',
+    'Soluciones informáticas de excelencia desde Chillán, Región de Ñuble.':'Excellent IT solutions from Chillán, Ñuble Region, Chile.',
+    // Atributos (accesibilidad)
+    'Informatic Analytics, inicio':'Informatic Analytics, home','Principal':'Main','Abrir menú':'Open menu','Cerrar menú':'Close menu','Idioma':'Language',
+    'Nuestros valores':'Our values','LinkedIn de Nombre Fundador':'LinkedIn of Founder Name','Anterior':'Previous','Siguiente':'Next',
+    'Tecnologías de desarrollo':'Development technologies','Tecnologías de datos':'Data technologies','Logos de clientes':'Client logos',
+    'Ver en español':'Ver en español'
+  };
+  const norm = s => s.trim().replace(/\s+/g, ' ');
+  const ATTRS = ['aria-label', 'alt', 'placeholder', 'content'];
+  // Se guarda el texto original de cada nodo/atributo para volver al español sin ambigüedades
+  const originals = new Map();
+  const swap = (key, get, set, lang) => {
+    if (!originals.has(key)) { const es = get(); if (!EN[norm(es)]) return; originals.set(key, es); }
+    const es = originals.get(key);
+    set(lang === 'en' ? es.replace(es.trim(), EN[norm(es)]) : es);
+  };
+  const titleKey = {};
+  function translate(lang){
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.parentElement.closest('script,style,#langNote') || !n.nodeValue.trim() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+    });
+    for (let n; (n = walker.nextNode());) swap(n, () => n.nodeValue, v => n.nodeValue = v, lang);
+    document.querySelectorAll('[aria-label],[alt],[placeholder],meta[name="description"]').forEach(el => ATTRS.forEach(a => {
+      if (!el.hasAttribute(a)) return;
+      if (!el.__i18n) el.__i18n = {};
+      if (!el.__i18n[a]) el.__i18n[a] = {};
+      swap(el.__i18n[a], () => el.getAttribute(a), v => el.setAttribute(a, v), lang);
+    }));
+    swap(titleKey, () => document.title, v => document.title = v, lang);
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang [data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+    const note = document.getElementById('langNote');
+    note.classList.toggle('show', lang === 'en');
+    clearTimeout(note._t); note._t = setTimeout(() => note.classList.remove('show'), 8000);
+  }
+  let currentLang = 'es';
+  function setLang(lang, remember){
+    if (lang !== currentLang) { translate(lang); currentLang = lang; }
+    if (remember) try { localStorage.setItem('lang', lang); } catch (e) {}
+    try { const url = new URL(location); url.searchParams.set('lang', lang); history.replaceState(null, '', url); } catch (e) {}
+  }
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang, true)));
+  // Idioma inicial: ?lang= en la URL > preferencia guardada > idioma del navegador
+  (() => {
+    let saved = null; try { saved = localStorage.getItem('lang'); } catch (e) {}
+    const param = new URLSearchParams(location.search).get('lang');
+    const auto = (navigator.language || 'es').toLowerCase().startsWith('es') ? 'es' : 'en';
+    const lang = ['es', 'en'].includes(param) ? param : (saved || auto);
+    if (lang === 'en') setLang('en', false);
+  })();
+
+  // Header compacto al hacer scroll
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('is-compact', scrollY > 40);
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  // Menú móvil
+  const burger = document.getElementById('burger'), nav = document.getElementById('nav');
+  burger.addEventListener('click', () => {
+    const open = nav.classList.toggle('is-open');
+    burger.setAttribute('aria-expanded', open);
+    burger.textContent = open ? '✕' : '☰';
+    header.classList.add('is-compact');
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    nav.classList.remove('is-open'); burger.textContent = '☰'; burger.setAttribute('aria-expanded', false);
+  }));
+
+  // Carrusel
+  const track = document.getElementById('track'), slides = [...track.children];
+  const cur = document.getElementById('cur'), bar = document.getElementById('bar');
+  const step = () => slides[1].offsetLeft - slides[0].offsetLeft;
+  document.getElementById('next').onclick = () => track.scrollBy({left: step(), behavior:'smooth'});
+  document.getElementById('prev').onclick = () => track.scrollBy({left: -step(), behavior:'smooth'});
+  track.addEventListener('scroll', () => {
+    const i = Math.min(slides.length - 1, Math.round(track.scrollLeft / step()));
+    const max = track.scrollWidth - track.clientWidth;
+    const idx = track.scrollLeft >= max - 4 ? slides.length - 1 : i;
+    cur.textContent = String(idx + 1).padStart(2, '0');
+    bar.style.width = ((idx + 1) / slides.length * 100) + '%';
+  }, {passive:true});
+
+  // Marquee de tecnologías
+  const dev = ['Angular','Flutter','Ionic','Node.js','Python','React','Spring Boot','Vue.js'];
+  const data = ['Teradata','SQL Server','Qlik','Power BI','Oracle','MySQL','MicroStrategy'];
+  const fill = (el, items) => { const html = items.map(t => `<span class="chip"><i></i>${t}</span>`).join(''); el.innerHTML = html + html; };
+  fill(document.getElementById('mq1'), dev); fill(document.getElementById('mq2'), data);
+
+  // Aparición al hacer scroll
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Fondo animado del hero: red de nodos de datos (reemplaza el video)
+  const c = document.getElementById('net'), ctx = c.getContext('2d');
+  const colors = ['#F2B705', '#1E8F5E', '#1C63A8'];
+  let pts = [], W, H;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){
+    const dpr = devicePixelRatio || 1;
+    W = c.clientWidth; H = c.clientHeight; c.width = W * dpr; c.height = H * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    const n = Math.round(W * H / 16000);
+    pts = Array.from({length:n}, (_, i) => ({x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35, c:colors[i%3], r:Math.random()*2+1.2}));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for (let i=0;i<pts.length;i++){
+      const p = pts[i];
+      if (!reduce){ p.x += p.vx; p.y += p.vy; if (p.x<0||p.x>W) p.vx*=-1; if (p.y<0||p.y>H) p.vy*=-1; }
+      for (let j=i+1;j<pts.length;j++){
+        const q = pts[j], d = Math.hypot(p.x-q.x, p.y-q.y);
+        if (d < 130){ ctx.strokeStyle = `rgba(201,211,219,${(1-d/130)*.25})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); }
+      }
+      ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  addEventListener('resize', () => { resize(); if (reduce) draw(); });
+  resize(); draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+{
+  "ui": {
+    "html_lang": "en",
+    "og_locale": "en_US",
+    "language_name": "English",
+    "skip_to_content": "Skip to content",
+    "home_aria": "Informatic Analytics, home",
+    "main_nav_aria": "Main",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "language_aria": "Language",
+    "nav": {
+      "about": "About us",
+      "team": "Team",
+      "services": "Services",
+      "clients": "Clients",
+      "technologies": "Technologies",
+      "contact": "Contact"
+    },
+    "header_cta": "Let's talk",
+    "translation_notice_action": "Ver en español",
+    "close": "Close",
+    "about": {
+      "mission": "Mission",
+      "vision": "Vision",
+      "values_aria": "Our values"
+    },
+    "team": {
+      "linkedin_of": "{name} on LinkedIn"
+    },
+    "data": {
+      "previous": "Previous",
+      "next": "Next",
+      "carousel_aria": "Data capabilities"
+    },
+    "technologies": {
+      "development_aria": "Development technologies",
+      "data_aria": "Data technologies"
+    },
+    "clients": {
+      "logos_aria": "Client logos"
+    },
+    "contact": {
+      "address": "Address",
+      "email": "E-mail",
+      "phone": "Phone",
+      "hours": "Hours",
+      "form": {
+        "name": "Name",
+        "company": "Company",
+        "email": "E-mail",
+        "phone": "Phone",
+        "service": "Service of interest",
+        "message": "Message",
+        "sending": "Sending…",
+        "error": "We couldn't send your message. Please try again or email us at {email}.",
+        "rate_limited": "You've sent several messages in a row. Please try again later.",
+        "invalid": "Please check the highlighted fields and try again."
+      }
+    },
+    "footer": {
+      "company": "Company",
+      "services": "Services",
+      "contact": "Contact",
+      "social_aria": "Social media"
+    },
+    "not_found": {
+      "title": "Page not found",
+      "body": "The page you're looking for doesn't exist or has been moved.",
+      "back": "Back to home"
+    }
+  },
+  "content": {
+    "site_settings": {
+      "company_name": "Informatic Analytics",
+      "logo_mark": "/media/site_settings/logo_mark.png",
+      "logo_wordmark": "/media/site_settings/logo_wordmark.png",
+      "logo_wordmark_light": "/media/site_settings/logo_wordmark_light.png",
+      "logo_full": "/media/site_settings/logo_full.png",
+      "favicon": "/media/site_settings/favicon.png",
+      "phone_display": "42-225 20 35",
+      "phone_link": "+56422252035",
+      "email": "contacto@ianalytics.cl",
+      "address": "Constitución 162, Chillán",
+      "maps_url": "https://goo.gl/maps/p57mE1qcWAjyYgaTA",
+      "linkedin_url": "",
+      "facebook_url": "",
+      "instagram_url": "",
+      "youtube_url": "",
+      "meta_title": "iAnalytics | IT solutions in Chillán, Chile",
+      "meta_description": "iAnalytics: custom software development, IT consulting and business intelligence from Chillán, Ñuble Region, Chile.",
+      "business_hours": "Monday to Friday, 9:00 a.m. to 6:00 p.m.",
+      "footer_tagline": "Excellent IT solutions from Chillán, Ñuble Region, Chile.",
+      "translation_notice": "This English version was translated automatically."
+    },
+    "hero": {
+      "primary_cta_url": "#contacto",
+      "secondary_cta_url": "#servicios",
+      "background_image": null,
+      "eyebrow": "Informatic Analytics · Chillán",
+      "title_line_1": "We don't just build software.",
+      "title_line_2": "We build solutions that work.",
+      "lead": "Digital transformation, web and mobile applications and business intelligence to help your company grow, through long-term relationships built on respect, reliability and trust.",
+      "primary_cta_text": "Let's talk",
+      "secondary_cta_text": "View services",
+      "highlights": [
+        {
+          "id": 1,
+          "accent_color": "yellow",
+          "text": "Digital Transformation"
+        },
+        {
+          "id": 2,
+          "accent_color": "green",
+          "text": "Web and Mobile Applications"
+        },
+        {
+          "id": 3,
+          "accent_color": "blue",
+          "text": "Business Intelligence"
+        }
+      ]
+    },
+    "about": {
+      "cta_url": "#contacto",
+      "eyebrow": "Who we are",
+      "title_line_1": "Born in Chillán",
+      "title_line_2": "to grow alongside your business",
+      "body": "We are a company from Chillán, capital of the Ñuble Region in Chile. We deliver excellent IT solutions and focus on building long-term relationships with our clients.",
+      "cta_text": "Write to us",
+      "mission": "To offer our clients commitment and reliability, delivering solutions that meet high quality standards. We seek long-term relationships with everyone around us, especially clients and team members, based on trust and mutual respect.",
+      "vision": "We aspire to be a solid, constantly growing company. We aim to be a benchmark in our field, fostering collaboration, respect, reliability and trust between clients and suppliers.",
+      "values": [
+        {
+          "id": 1,
+          "accent_color": "yellow",
+          "name": "Honesty",
+          "description": "Transparency at every stage of the project."
+        },
+        {
+          "id": 2,
+          "accent_color": "green",
+          "name": "Professionalism",
+          "description": "An expert team and rigorous processes."
+        },
+        {
+          "id": 3,
+          "accent_color": "blue",
+          "name": "Commitment",
+          "description": "We see every project through to the end."
+        },
+        {
+          "id": 4,
+          "accent_color": "base",
+          "name": "Personalized service",
+          "description": "Solutions designed for your business."
+        }
+      ]
+    },
+    "team": {
+      "cta_url": "",
+      "eyebrow": "Our team",
+      "title_line_1": "The people behind",
+      "title_line_2": "every solution",
+      "body": "A team of professionals from Ñuble combining software development, consulting and data analytics to support your company at every stage.",
+      "cta_text": "",
+      "founders_label": "Founders",
+      "members_label": "Team",
+      "founders": [],
+      "members": []
+    },
+    "services": {
+      "cta_url": "#contacto",
+      "eyebrow": "Services",
+      "title_line_1": "Technology tailored",
+      "title_line_2": "to every challenge",
+      "body": "From a single web application to an organization-wide data strategy: we help you make the most of your resources and maximize your profits.",
+      "cta_text": "Tell us about your project",
+      "items": [
+        {
+          "id": 1,
+          "link_url": "#tecnologias",
+          "accent_color": "yellow",
+          "features": [
+            {
+              "id": 1,
+              "text": "End-to-end development of interactive, secure web applications."
+            },
+            {
+              "id": 2,
+              "text": "Code written by professionals."
+            },
+            {
+              "id": 3,
+              "text": "Hosting on the right server, plus maintenance and support."
+            },
+            {
+              "id": 4,
+              "text": "Web applications with custom design."
+            }
+          ],
+          "tag": "Development",
+          "title": "Custom Applications",
+          "menu_description": "Web and mobile, from design to support",
+          "description": "We build custom applications using a range of programming languages.",
+          "link_text": "View technologies"
+        },
+        {
+          "id": 2,
+          "link_url": "#contacto",
+          "accent_color": "green",
+          "features": [
+            {
+              "id": 5,
+              "text": "Information security."
+            },
+            {
+              "id": 6,
+              "text": "Process consulting."
+            },
+            {
+              "id": 7,
+              "text": "Business requirements and IT architecture."
+            },
+            {
+              "id": 8,
+              "text": "Digital transformation."
+            },
+            {
+              "id": 9,
+              "text": "Strategic consulting."
+            }
+          ],
+          "tag": "Consulting",
+          "title": "Consulting",
+          "menu_description": "Processes, security and digital transformation",
+          "description": "We advise companies across industries on optimizing resources and maximizing profits.",
+          "link_text": "Book a consultation"
+        },
+        {
+          "id": 3,
+          "link_url": "#datos",
+          "accent_color": "blue",
+          "features": [
+            {
+              "id": 10,
+              "text": "Data warehouses and data marts."
+            },
+            {
+              "id": 11,
+              "text": "Relational and multidimensional data modeling."
+            },
+            {
+              "id": 12,
+              "text": "Reporting and executive dashboards."
+            },
+            {
+              "id": 13,
+              "text": "Data mining and data analytics."
+            }
+          ],
+          "tag": "Data",
+          "title": "Data Visibility",
+          "menu_description": "Data warehousing, BI and executive reporting",
+          "description": "We add value and visibility to your data, turning it into information and competitive advantage.",
+          "link_text": "Explore capabilities"
+        }
+      ]
+    },
+    "data_capabilities": {
+      "cta_url": "#contacto",
+      "eyebrow": "Why data matters",
+      "title_line_1": "Your data already has the answers.",
+      "title_line_2": "We make them visible.",
+      "body": "We work with companies to turn their data into information and gain a competitive edge in their fields.",
+      "cta_text": "Let's talk about your data",
+      "items": [
+        {
+          "id": 1,
+          "title": "Data Warehouse",
+          "description": "Data warehouse design and implementation."
+        },
+        {
+          "id": 2,
+          "title": "Data Modeling",
+          "description": "Design and implementation of relational and multidimensional data models."
+        },
+        {
+          "id": 3,
+          "title": "Data Mart",
+          "description": "Data mart design and implementation."
+        },
+        {
+          "id": 4,
+          "title": "Multiplatform",
+          "description": "Integration of multiple development platforms within a single project."
+        },
+        {
+          "id": 5,
+          "title": "Reporting",
+          "description": "Design and implementation of reports and executive dashboards."
+        },
+        {
+          "id": 6,
+          "title": "Data Mining & Analytics",
+          "description": "Pattern discovery and advanced data analysis."
+        }
+      ]
+    },
+    "technologies": {
+      "cta_url": "",
+      "eyebrow": "Technologies",
+      "title_line_1": "The right tools",
+      "title_line_2": "for every project",
+      "body": "We work with modern development frameworks and the leading database and business intelligence platforms on the market.",
+      "cta_text": "",
+      "development_label": "Web and mobile development",
+      "data_label": "Data and business intelligence",
+      "items": [
+        {
+          "id": 9,
+          "name": "Teradata",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 10,
+          "name": "SQL Server",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 11,
+          "name": "Qlik",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 12,
+          "name": "Power BI",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 13,
+          "name": "Oracle",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 14,
+          "name": "MySQL",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 15,
+          "name": "MicroStrategy",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 1,
+          "name": "Angular",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 2,
+          "name": "Flutter",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 3,
+          "name": "Ionic",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 4,
+          "name": "Node.js",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 5,
+          "name": "Python",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 6,
+          "name": "React",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 7,
+          "name": "Spring Boot",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 8,
+          "name": "Vue.js",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        }
+      ]
+    },
+    "clients": {
+      "cta_url": "#contacto",
+      "eyebrow": "Featured clients",
+      "title_line_1": "Companies that trust",
+      "title_line_2": "our work",
+      "body": "We support organizations across industries in their digital transformation and data management.",
+      "cta_text": "Be our next success story",
+      "items": [],
+      "testimonials": [],
+      "certifications": [
+        {
+          "id": 1,
+          "image": null,
+          "accent_color": "green",
+          "badge_text": "40 h",
+          "title": "40-hour workweek certification",
+          "issuer": "Chilean Ministry of Labor and Social Security."
+        }
+      ]
+    },
+    "contact": {
+      "cta_url": "",
+      "eyebrow": "How to find us",
+      "title_line_1": "Contact information",
+      "title_line_2": "",
+      "body": "If you have any questions, reach out through any of our channels or send us an email.",
+      "cta_text": "",
+      "banner_title": "Let's build your company's next chapter together.",
+      "banner_button_text": "Get in touch",
+      "form_submit_text": "Send message",
+      "form_success_message": "Thank you! We'll get back to you shortly.",
+      "form_other_option": "Other",
+      "service_options": [
+        "Custom Applications",
+        "Consulting",
+        "Data Visibility"
+      ]
+    }
+  }
+}

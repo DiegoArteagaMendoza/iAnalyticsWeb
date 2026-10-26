@@ -1,0 +1,105 @@
+---
+import { edit_item, edit_link, edit_section, edit_text } from "../../lib/edit_attrs";
+import type { Service, ServicesSection } from "../../lib/types";
+import SectionHeading from "../common/section_heading.astro";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  services: ServicesSection;
+  editing?: boolean;
+}
+
+const { services, editing = false } = Astro.props;
+const service_target = (service: Service, field: string) => ["services", service.id, field] as [string, number, string];
+---
+
+<section class="services" id="servicios" aria-labelledby="services_title" {...edit_section(editing, "services_section", services.is_visible, "Servicios")}>
+  <div class="wrap">
+    <SectionHeading {...services} eyebrow_color="blue" heading_id="services_title" editing={editing} endpoint="services_section" />
+    <div class="services_grid">
+      {
+        services.items.map((service) => (
+          <article
+            class={`service reveal accent_${service.accent_color}`}
+            id={`servicio_${service.id}`}
+            {...edit_item(editing, "services", service.id, { is_published: service.is_published, accent_color: service.accent_color, label: "servicio" })}
+          >
+            {(editing || service.tag) && (
+              <span class={`tag accent_${service.accent_color}`} {...edit_text(editing, service_target(service, "tag"), { placeholder: "Etiqueta" })}>
+                {service.tag}
+              </span>
+            )}
+            <h3 {...edit_text(editing, service_target(service, "title"), { placeholder: "Título" })}>{service.title}</h3>
+            {editing && (
+              <p class="menu_description" title="Texto que aparece bajo el nombre en el menú Servicios">
+                <small>En el menú:</small>{" "}
+                <span {...edit_text(editing, service_target(service, "menu_description"), { placeholder: "Descripción corta para el menú" })}>
+                  {service.menu_description}
+                </span>
+              </p>
+            )}
+            {(editing || service.description) && (
+              <p {...edit_text(editing, service_target(service, "description"), { multiline: true, placeholder: "Descripción" })}>{service.description}</p>
+            )}
+            {(editing || service.features.length > 0) && (
+              <ul>
+                {service.features.map((feature) => (
+                  <li {...edit_item(editing, "service_features", feature.id, { label: "característica" })}>
+                    <span {...edit_text(editing, ["service_features", feature.id, "text"], { placeholder: "Característica" })}>{feature.text}</span>
+                  </li>
+                ))}
+                {editing && (
+                  <li class="add_feature">
+                    <EditAddButton
+                      endpoint="service_features"
+                      label="Característica"
+                      defaults={{ service: service.id, text_es: "Nueva característica.", order: service.features.length }}
+                    />
+                  </li>
+                )}
+              </ul>
+            )}
+            {(editing || (service.link_text && service.link_url)) && (
+              <a
+                class="link arrow"
+                href={service.link_url || "#"}
+                {...edit_text(editing, service_target(service, "link_text"), { placeholder: "Texto del enlace" })}
+                {...edit_link(editing, service_target(service, "link_url"))}
+              >{service.link_text}</a>
+            )}
+          </article>
+        ))
+      }
+      {
+        editing && (
+          <EditAddButton
+            endpoint="services"
+            label="Servicio"
+            defaults={{ title_es: "Nuevo servicio", tag_es: "Etiqueta", description_es: "Descripción del servicio.", accent_color: "yellow", order: services.items.length }}
+          />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .services { background: var(--paper); }
+  .services_grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .service {
+    background: var(--surface); padding: 36px 32px; display: flex; flex-direction: column;
+    border-bottom: 4px solid transparent; transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+  }
+  .service:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(18, 32, 43, 0.12); border-color: var(--yellow); }
+  h3 { font-size: 1.6rem; margin-bottom: 12px; }
+  .service > p { color: var(--muted); margin-bottom: 20px; }
+  .service > p.menu_description { font-size: 0.85rem; margin-bottom: 12px; padding: 8px 10px; background: var(--paper); border-left: 3px solid var(--blue); }
+  ul { list-style: none; padding: 0; margin: 0 0 28px; flex: 1; }
+  li { padding: 10px 0 10px 28px; border-top: 1px solid var(--line); position: relative; font-size: 0.95rem; }
+  li::before { content: ""; position: absolute; left: 4px; top: 18px; width: 10px; height: 10px; background: var(--accent); }
+  li.add_feature { padding-left: 0; }
+  li.add_feature::before { display: none; }
+  li.add_feature :global(.edit_add_button) { min-height: 40px; padding: 8px; }
+  .link { align-self: flex-start; }
+  @media (max-width: 400px) { .services_grid { grid-template-columns: 1fr; } }
+</style>

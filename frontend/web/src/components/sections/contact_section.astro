@@ -1,0 +1,223 @@
+---
+import { edit_link, edit_section, edit_text } from "../../lib/edit_attrs";
+import { format_text, get_ui, type Language } from "../../lib/i18n";
+import type { ContactSection, SiteSettings } from "../../lib/types";
+
+interface Props {
+  contact: ContactSection;
+  site_settings: SiteSettings;
+  language: Language;
+  /** Resultado de un envío sin JavaScript (?contact=sent|error|rate_limited|invalid) */
+  submission_status?: string | null;
+  editing?: boolean;
+}
+
+const { contact, site_settings, language, submission_status, editing = false } = Astro.props;
+const target = (field: string) => ["contact_section", null, field] as [string, null, string];
+const settings_target = (field: string) => ["site_settings", null, field] as [string, null, string];
+const ui = get_ui(language);
+const form_ui = ui.contact.form;
+const messages = {
+  sent: contact.form_success_message,
+  error: format_text(form_ui.error, { email: site_settings.email }),
+  rate_limited: form_ui.rate_limited,
+  invalid: form_ui.invalid,
+};
+const initial_message = submission_status && submission_status in messages ? messages[submission_status as keyof typeof messages] : "";
+const options = [...contact.service_options, contact.form_other_option].filter(Boolean);
+---
+
+<section class="contact" id="contacto" aria-labelledby="contact_title" {...edit_section(editing, "contact_section", contact.is_visible, "Contacto")}>
+  <div class="wrap contact_grid">
+    <div class="reveal">
+      {(editing || contact.eyebrow) && <div class="eyebrow" style="--eyebrow_color: var(--blue)" {...edit_text(editing, target("eyebrow"), { placeholder: "Etiqueta" })}>{contact.eyebrow}</div>}
+      <h2 id="contact_title">
+        <span {...edit_text(editing, target("title_line_1"), { placeholder: "Título" })}>{contact.title_line_1}</span>
+        {(editing || contact.title_line_2) && <span {...edit_text(editing, target("title_line_2"), { placeholder: "Continuación del título" })}> {contact.title_line_2}</span>}
+      </h2>
+      {(editing || contact.body) && <p class="intro" {...edit_text(editing, target("body"), { multiline: true, placeholder: "Párrafo" })}>{contact.body}</p>}
+      <dl class="info">
+        {
+          (editing || site_settings.address) && (
+            <div>
+              <dt>{ui.contact.address}</dt>
+              <dd>
+                {editing ? (
+                  <a href={site_settings.maps_url || "#"} {...edit_text(editing, settings_target("address"), { translatable: false, placeholder: "Dirección" })} {...edit_link(editing, settings_target("maps_url"))}>
+                    {site_settings.address}
+                  </a>
+                ) : site_settings.maps_url ? (
+                  <a href={site_settings.maps_url} target="_blank" rel="noopener">{site_settings.address}</a>
+                ) : (
+                  site_settings.address
+                )}
+              </dd>
+            </div>
+          )
+        }
+        {
+          (editing || site_settings.email) && (
+            <div>
+              <dt>{ui.contact.email}</dt>
+              <dd><a href={`mailto:${site_settings.email}`} {...edit_text(editing, settings_target("email"), { translatable: false, placeholder: "correo@empresa.cl" })}>{site_settings.email}</a></dd>
+            </div>
+          )
+        }
+        {
+          (editing || site_settings.phone_display) && (
+            <div>
+              <dt>{ui.contact.phone}</dt>
+              <dd>
+                <a href={`tel:${site_settings.phone_link || site_settings.phone_display}`} {...edit_text(editing, settings_target("phone_display"), { translatable: false, placeholder: "Teléfono" })}>
+                  {site_settings.phone_display}
+                </a>
+                {editing && (
+                  <small class="edit_hint">
+                    Para marcar: <span {...edit_text(editing, settings_target("phone_link"), { translatable: false, placeholder: "+56422252035" })}>{site_settings.phone_link}</span>
+                  </small>
+                )}
+              </dd>
+            </div>
+          )
+        }
+        {
+          (editing || site_settings.business_hours) && (
+            <div>
+              <dt>{ui.contact.hours}</dt>
+              <dd {...edit_text(editing, settings_target("business_hours"), { placeholder: "Horario de atención" })}>{site_settings.business_hours}</dd>
+            </div>
+          )
+        }
+      </dl>
+    </div>
+
+    <form
+      class="contact_form reveal"
+      method="post"
+      action="/api/contact"
+      data-contact_form
+      data-success={messages.sent}
+      data-error={messages.error}
+      data-rate_limited={messages.rate_limited}
+      data-invalid={messages.invalid}
+      data-sending={form_ui.sending}
+    >
+      <input type="hidden" name="language" value={language} />
+      <div class="honeypot" aria-hidden="true">
+        <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <div class="row">
+        <label>{form_ui.name}<input type="text" name="full_name" required maxlength="120" autocomplete="name" /></label>
+        <label>{form_ui.company}<input type="text" name="company" maxlength="120" autocomplete="organization" /></label>
+      </div>
+      <div class="row">
+        <label>{form_ui.email}<input type="email" name="email" required maxlength="254" autocomplete="email" /></label>
+        <label>{form_ui.phone}<input type="tel" name="phone" maxlength="40" autocomplete="tel" /></label>
+      </div>
+      {
+        options.length > 0 && (
+          <label>
+            {form_ui.service}
+            <select name="service_of_interest">{options.map((option) => <option>{option}</option>)}</select>
+          </label>
+        )
+      }
+      <label>{form_ui.message}<textarea name="message" maxlength="5000"></textarea></label>
+      <div class="form_footer">
+        <button class="btn btn_primary arrow" type="submit" {...edit_text(editing, target("form_submit_text"), { placeholder: "Enviar" })}>{contact.form_submit_text}</button>
+        <p
+          class:list={["form_status", { is_success: submission_status === "sent", is_error: initial_message && submission_status !== "sent" }]}
+          role="status"
+          aria-live="polite"
+          data-form_status
+        >{initial_message}</p>
+      </div>
+      {
+        editing && (
+          <div class="edit_form_texts">
+            <p><small>Mensaje tras enviar:</small> <span {...edit_text(editing, target("form_success_message"), { placeholder: "¡Gracias! Le responderemos a la brevedad." })}>{contact.form_success_message}</span></p>
+            <p><small>Opción final del selector:</small> <span {...edit_text(editing, target("form_other_option"), { placeholder: "Otro" })}>{contact.form_other_option}</span></p>
+          </div>
+        )
+      }
+    </form>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("[data-contact_form]").forEach((form) => {
+    const status = form.querySelector<HTMLElement>("[data-form_status]")!;
+    const button = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+    const button_text = button.textContent ?? "";
+    const show = (message: string, kind: "success" | "error" | "") => {
+      status.textContent = message;
+      status.classList.toggle("is_success", kind === "success");
+      status.classList.toggle("is_error", kind === "error");
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      button.textContent = form.dataset.sending ?? button_text;
+      show("", "");
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        });
+        const result = await response.json().catch(() => ({ status: "error" }));
+        if (response.ok) {
+          form.reset();
+          show(form.dataset.success ?? "", "success");
+        } else {
+          const key = result.status === "rate_limited" ? "rate_limited" : result.status === "invalid" ? "invalid" : "error";
+          show(form.dataset[key] ?? "", "error");
+        }
+      } catch {
+        show(form.dataset.error ?? "", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = button_text;
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact_grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; }
+  h2 { font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 16px; }
+  .intro { color: var(--muted); margin-bottom: 32px; }
+  .info { margin: 0; }
+  .info div { padding: 24px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 140px 1fr; gap: 16px; }
+  .info div:last-child { border-bottom: 1px solid var(--line); }
+  dt { font: 600 0.8rem var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  dd { margin: 0; font-weight: 500; }
+  .info a { text-decoration: none; border-bottom: 1px solid var(--yellow); }
+  .info a:hover { border-color: var(--green); }
+
+  .contact_form { background: var(--surface); padding: 40px; display: grid; gap: 18px; align-content: start; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  label { display: grid; gap: 6px; font-size: 0.88rem; font-weight: 600; }
+  input, textarea, select {
+    font: inherit; font-weight: 400; padding: 0.8rem 1rem; border: 1px solid var(--line);
+    background: var(--paper); color: var(--base); border-radius: 0;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue); }
+  textarea { min-height: 120px; resize: vertical; }
+  .honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .form_footer { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .form_status { font-size: 0.95rem; font-weight: 500; }
+  .form_status:empty { display: none; }
+  .form_status.is_success { color: var(--green); }
+  .form_status.is_error { color: #b42318; }
+  @media (max-width: 900px) {
+    .contact_grid { grid-template-columns: 1fr; gap: 40px; }
+    .row { grid-template-columns: 1fr; }
+    .contact_form { padding: 28px; }
+    .info div { grid-template-columns: 1fr; gap: 4px; }
+  }
+  .edit_hint { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--muted); font-weight: 400; }
+  .edit_form_texts { display: grid; gap: 8px; padding: 12px; border: 1px dashed var(--blue); font-size: 0.88rem; }
+  .edit_form_texts small { color: var(--blue); font-weight: 600; }
+</style>

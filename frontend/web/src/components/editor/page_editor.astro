@@ -1,0 +1,554 @@
+---
+/**
+ * Editor visual del panel. Se incluye solo en /panel/vista_previa (dentro del iframe de "Editar").
+ * Lee los atributos data-edit-* que ponen los componentes (ver src/lib/edit_attrs.ts) y guarda
+ * cada cambio en el backend a través de /panel/api/..., que agrega el token de la sesión.
+ */
+import type { Language } from "../../lib/i18n";
+
+interface Props {
+  language: Language;
+}
+
+const { language } = Astro.props;
+---
+
+<div id="page_editor" class="editor_ui" data-language={language}>
+  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon" hidden data-editor-file />
+  <div class="editor_float" data-editor-image-button hidden>
+    <button type="button" data-action="pick">🖼 <span>Cambiar imagen</span></button>
+    <button type="button" data-action="remove" title="Quitar imagen">✕</button>
+  </div>
+  <button type="button" class="editor_float editor_link_button" data-editor-link-button hidden>🔗 Enlace</button>
+  <form class="editor_link_popover" data-editor-link-popover hidden>
+    <label>Enlace (URL o #seccion)<input type="text" name="url" autocomplete="off" spellcheck="false" /></label>
+    <div class="editor_popover_actions">
+      <button type="submit">Guardar</button>
+      <button type="button" data-action="cancel">Cancelar</button>
+    </div>
+    <p class="editor_hint">Ej: <code>#contacto</code>, <code>https://…</code>, <code>mailto:…</code></p>
+  </form>
+  <div class="editor_toasts" aria-live="polite" data-editor-toasts></div>
+</div>
+
+<script>
+  type Target = { endpoint: string; id: string | null; field: string };
+
+  const root = document.getElementById("page_editor")!;
+  const language = root.dataset.language ?? "es";
+  const accent_cycle = ["yellow", "green", "blue", "base"];
+  const scroll_key = "page_editor_scroll";
+
+  document.documentElement.classList.add("is_page_editor");
+  document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is_visible"));
+
+  // --- Utilidades -----------------------------------------------------------------
+
+  const parse_target = (value: string): Target => {
+    const [endpoint, id, field] = value.split("|");
+    return { endpoint, id: id || null, field };
+  };
+  const resource_path = (endpoint: string, id: string | null) => (id ? `${endpoint}/${id}/` : `${endpoint}/`);
+  const field_key = (element: HTMLElement, field: string) => (element.dataset.editPlain ? field : `${field}_${language}`);
+
+  function toast(message: string, kind: "success" | "error" | "info" = "success") {
+    const container = root.querySelector<HTMLElement>("[data-editor-toasts]")!;
+    const item = document.createElement("div");
+    item.className = `editor_toast is_${kind}`;
+    item.textContent = message;
+    container.append(item);
+    window.setTimeout(() => item.remove(), kind === "error" ? 6000 : 2200);
+  }
+
+  function error_message(data: unknown): string {
+    if (data && typeof data === "object") {
+      const first = Object.entries(data as Record<string, unknown>)[0];
+      if (first) {
+        const [field, value] = first;
+        const text = Array.isArray(value) ? value[0] : value;
+        return field === "detail" ? String(text) : `${field}: ${String(text)}`;
+      }
+    }
+    return "No se pudo guardar.";
+  }
+
+  async function api(path: string, init: RequestInit = {}): Promise<{ ok: boolean; data: any }> {
+    const headers = new Headers(init.headers);
+    headers.set("X-Panel-Request", "1");
+    try {
+      const response = await fetch(`/panel/api/${path}`, { ...init, headers, credentials: "same-origin" });
+      if (response.status === 401) {
+        toast("La sesión expiró. Vuelva a ingresar.", "error");
+        window.setTimeout(() => (window.top ?? window).location.assign("/panel/ingresar"), 1500);
+        return { ok: false, data: null };
+      }
+      const data = response.status === 204 ? null : await response.json().catch(() => null);
+      if (!response.ok) toast(error_message(data), "error");
+      return { ok: response.ok, data };
+    } catch {
+      toast("Sin conexión con el servidor.", "error");
+      return { ok: false, data: null };
+    }
+  }
+
+  const patch_json = (target: Target, body: Record<string, unknown>) =>
+    api(resource_path(target.endpoint, target.id), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  function reload_preserving_scroll() {
+    try { sessionStorage.setItem(scroll_key, String(window.scrollY)); } catch { /* sin almacenamiento */ }
+    window.location.reload();
+  }
+  try {
+    const saved_scroll = sessionStorage.getItem(scroll_key);
+    if (saved_scroll) {
+      sessionStorage.removeItem(scroll_key);
+      window.requestAnimationFrame(() => window.scrollTo(0, Number(saved_scroll)));
+    }
+  } catch { /* sin almacenamiento */ }
+
+  // En el editor los enlaces y el formulario no navegan
+  document.addEventListener(
+    "click",
+    (event) => {
+      const link = (event.target as HTMLElement).closest("a");
+      if (!link || link.closest(".editor_ui")) return;
+      const href = link.getAttribute("href") ?? "";
+      if (!href.startsWith("#") || link.hasAttribute("data-edit-text")) event.preventDefault();
+    },
+    true,
+  );
+  document.addEventListener("submit", (event) => {
+    if (!(event.target as HTMLElement).closest(".editor_ui")) event.preventDefault();
+  }, true);
+
+  // --- Textos ----------------------------------------------------------------------
+
+  const read_text = (element: HTMLElement) => {
+    const text = element.innerText.replace(/ /g, " ");
+    return element.dataset.editMultiline ? text.trim() : text.replace(/\s+/g, " ").trim();
+  };
+
+  /** Inserta texto plano en la posición del cursor (para pegar sin formato). */
+  function insert_text(text: string) {
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  async function save_text(element: HTMLElement) {
+    const value = read_text(element);
+    if (value === element.dataset.original) return;
+    const target = parse_target(element.dataset.editText!);
+    element.classList.add("is_saving");
+    const { ok } = await patch_json(target, { [field_key(element, target.field)]: value });
+    element.classList.remove("is_saving");
+    if (!ok) {
+      element.innerText = element.dataset.original ?? "";
+      return;
+    }
+    element.dataset.original = value;
+    // El mismo dato puede aparecer en varios lugares (ej. teléfono en encabezado y contacto)
+    document.querySelectorAll<HTMLElement>(`[data-edit-text="${CSS.escape(element.dataset.editText!)}"]`).forEach((other) => {
+      if (other !== element) {
+        other.innerText = value;
+        other.dataset.original = value;
+      }
+    });
+    element.classList.add("is_saved");
+    window.setTimeout(() => element.classList.remove("is_saved"), 1200);
+    toast("Guardado");
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-edit-text]").forEach((element) => {
+    element.setAttribute("contenteditable", "plaintext-only");
+    if (element.contentEditable !== "plaintext-only") element.setAttribute("contenteditable", "true");
+    element.spellcheck = true;
+    element.dataset.original = read_text(element);
+    // Quita los espacios y saltos de línea del HTML, visibles al editar
+    element.textContent = element.dataset.original;
+    element.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !element.dataset.editMultiline) {
+        event.preventDefault();
+        element.blur();
+      } else if (event.key === "Escape") {
+        element.innerText = element.dataset.original ?? "";
+        element.blur();
+      } else if (event.key === " " && element.tagName === "BUTTON") {
+        event.preventDefault();
+        insert_text(" ");
+      }
+    });
+    element.addEventListener("paste", (event) => {
+      event.preventDefault();
+      const text = event.clipboardData?.getData("text/plain") ?? "";
+      insert_text(element.dataset.editMultiline ? text : text.replace(/\s+/g, " "));
+    });
+    element.addEventListener("blur", () => save_text(element));
+  });
+
+  // --- Botones flotantes (imagen y enlace) ------------------------------------------
+
+  function place(floating: HTMLElement, anchor: HTMLElement, corner: "top_right" | "bottom_left") {
+    const box = anchor.getBoundingClientRect();
+    floating.hidden = false;
+    const width = floating.offsetWidth;
+    const top = corner === "top_right" ? box.top + 6 : box.bottom - floating.offsetHeight - 6;
+    const left = corner === "top_right" ? Math.max(6, box.right - width - 6) : box.left + 6;
+    floating.style.top = `${Math.max(6, top) + window.scrollY}px`;
+    floating.style.left = `${Math.min(left, document.documentElement.clientWidth - width - 6) + window.scrollX}px`;
+  }
+
+  function floating_controller(
+    floating: HTMLElement,
+    selector: string,
+    corner: "top_right" | "bottom_left",
+    before_show?: (element: HTMLElement) => void,
+  ) {
+    let current: HTMLElement | null = null;
+    let hide_timer = 0;
+    const show = (element: HTMLElement) => {
+      window.clearTimeout(hide_timer);
+      if (element === current && !floating.hidden) return;
+      current = element;
+      // Se ajusta el contenido antes de medir, para que el botón no cambie de tamaño bajo el cursor
+      before_show?.(element);
+      place(floating, element, corner);
+    };
+    const schedule_hide = () => {
+      hide_timer = window.setTimeout(() => {
+        floating.hidden = true;
+        current = null;
+      }, 350);
+    };
+    document.addEventListener("mouseover", (event) => {
+      const element = (event.target as HTMLElement).closest<HTMLElement>(selector);
+      if (element && !element.closest(".editor_ui")) show(element);
+    });
+    document.addEventListener("mouseout", (event) => {
+      const element = (event.target as HTMLElement).closest<HTMLElement>(selector);
+      if (element && !element.contains(event.relatedTarget as Node)) schedule_hide();
+    });
+    document.addEventListener("focusin", (event) => {
+      const element = (event.target as HTMLElement).closest<HTMLElement>(selector);
+      if (element && !element.closest(".editor_ui")) show(element);
+    });
+    floating.addEventListener("mouseenter", () => window.clearTimeout(hide_timer));
+    floating.addEventListener("mouseleave", schedule_hide);
+    window.addEventListener("scroll", () => current && place(floating, current, corner), { passive: true });
+    return () => current;
+  }
+
+  // Imágenes
+  const image_button = root.querySelector<HTMLElement>("[data-editor-image-button]")!;
+  const file_input = root.querySelector<HTMLInputElement>("[data-editor-file]")!;
+  const current_image = floating_controller(image_button, "[data-edit-image]", "top_right", (element) => {
+    image_button.querySelector("span")!.textContent = element.dataset.editImageLabel ?? "Cambiar imagen";
+    // "Quitar" solo si hay una imagen propia (no en logos por defecto ni sin foto)
+    const has_image = element.tagName === "IMG" ? !(element as HTMLImageElement).src.includes("/brand/") : Boolean(element.querySelector("img") || element.style.backgroundImage);
+    image_button.querySelector<HTMLElement>('[data-action="remove"]')!.hidden = !has_image;
+  });
+  let image_target: HTMLElement | null = null;
+  image_button.querySelector('[data-action="pick"]')!.addEventListener("click", () => {
+    image_target = current_image();
+    if (image_target) file_input.click();
+  });
+  image_button.querySelector('[data-action="remove"]')!.addEventListener("click", async () => {
+    const element = current_image();
+    if (!element || !window.confirm("¿Quitar esta imagen? Se usará la imagen o el diseño por defecto.")) return;
+    const target = parse_target(element.dataset.editImage!);
+    const body = new FormData();
+    body.append(target.field, "");
+    const { ok } = await api(resource_path(target.endpoint, target.id), { method: "PATCH", body });
+    if (ok) reload_preserving_scroll();
+  });
+  file_input.addEventListener("change", async () => {
+    const file = file_input.files?.[0];
+    file_input.value = "";
+    if (!file || !image_target) return;
+    const target = parse_target(image_target.dataset.editImage!);
+    const body = new FormData();
+    body.append(target.field, file);
+    toast("Subiendo imagen…", "info");
+    const { ok } = await api(resource_path(target.endpoint, target.id), { method: "PATCH", body });
+    if (ok) reload_preserving_scroll();
+  });
+  // Clic directo sobre una imagen editable también abre el selector
+  document.addEventListener("click", (event) => {
+    const element = event.target as HTMLElement;
+    if (element.tagName === "IMG" && element.hasAttribute("data-edit-image")) {
+      event.preventDefault();
+      image_target = element;
+      file_input.click();
+    }
+  });
+
+  // Enlaces
+  const link_button = root.querySelector<HTMLElement>("[data-editor-link-button]")!;
+  const link_popover = root.querySelector<HTMLFormElement>("[data-editor-link-popover]")!;
+  const link_input = link_popover.querySelector<HTMLInputElement>("input")!;
+  const current_link = floating_controller(link_button, "[data-edit-link]", "bottom_left");
+  let link_target: HTMLElement | null = null;
+
+  link_button.addEventListener("click", () => {
+    link_target = current_link();
+    if (!link_target) return;
+    const box = link_target.getBoundingClientRect();
+    link_input.value = link_target.getAttribute("href") === "#" ? "" : link_target.getAttribute("href") ?? "";
+    link_popover.hidden = false;
+    link_popover.style.top = `${box.bottom + window.scrollY + 8}px`;
+    link_popover.style.left = `${Math.min(box.left, document.documentElement.clientWidth - 340) + window.scrollX}px`;
+    link_input.focus();
+    link_input.select();
+  });
+  link_popover.querySelector('[data-action="cancel"]')!.addEventListener("click", () => (link_popover.hidden = true));
+  link_popover.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") link_popover.hidden = true;
+  });
+  link_popover.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!link_target) return;
+    const target = parse_target(link_target.dataset.editLink!);
+    const url = link_input.value.trim();
+    const { ok } = await patch_json(target, { [target.field]: url });
+    if (!ok) return;
+    link_target.setAttribute("href", url || "#");
+    link_target.classList.toggle("is_empty_link", !url);
+    link_popover.hidden = true;
+    toast("Enlace guardado");
+  });
+
+  // --- Elementos de listas -----------------------------------------------------------
+
+  function sibling_items(item: HTMLElement): HTMLElement[] {
+    const endpoint = item.dataset.editItem!.split("|")[0];
+    return Array.from(item.parentElement!.children).filter(
+      (child): child is HTMLElement => child instanceof HTMLElement && (child.dataset.editItem ?? "").startsWith(`${endpoint}|`),
+    );
+  }
+
+  async function save_order(items: HTMLElement[]) {
+    const results = await Promise.all(
+      items.map((item, index) => {
+        const [endpoint, id] = item.dataset.editItem!.split("|");
+        return patch_json({ endpoint, id, field: "order" }, { order: index });
+      }),
+    );
+    if (results.every((result) => result.ok)) toast("Orden guardado");
+  }
+
+  function build_toolbar(item: HTMLElement) {
+    const [endpoint, id] = item.dataset.editItem!.split("|");
+    const label = item.dataset.editLabel ?? "elemento";
+    const toolbar = document.createElement("div");
+    toolbar.className = "editor_ui editor_item_toolbar";
+    toolbar.setAttribute("role", "toolbar");
+    toolbar.setAttribute("aria-label", `Opciones del ${label}`);
+
+    const add_button = (text: string, title: string, handler: () => void, class_name = "") => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = text;
+      button.title = title;
+      button.setAttribute("aria-label", title);
+      if (class_name) button.className = class_name;
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handler();
+      });
+      toolbar.append(button);
+      return button;
+    };
+
+    if (item.dataset.published !== undefined) {
+      const publish_button = add_button("", "", async () => {
+        const next = item.dataset.published !== "true";
+        const { ok } = await patch_json({ endpoint, id, field: "is_published" }, { is_published: next });
+        if (!ok) return;
+        item.dataset.published = String(next);
+        update_publish_button();
+        toast(next ? `${label[0].toUpperCase()}${label.slice(1)} publicado en el sitio` : "Oculto del sitio");
+      }, "is_publish");
+      const update_publish_button = () => {
+        const published = item.dataset.published === "true";
+        publish_button.textContent = published ? "● Publicado" : "○ No publicado";
+        publish_button.title = published ? "Visible en el sitio. Clic para ocultar." : "No se ve en el sitio. Clic para publicar.";
+        publish_button.classList.toggle("is_off", !published);
+      };
+      update_publish_button();
+    }
+
+    add_button("←", "Mover antes", () => {
+      const items = sibling_items(item);
+      const index = items.indexOf(item);
+      if (index <= 0) return;
+      items[index - 1].before(item);
+      save_order(sibling_items(item));
+    });
+    add_button("→", "Mover después", () => {
+      const items = sibling_items(item);
+      const index = items.indexOf(item);
+      if (index === -1 || index >= items.length - 1) return;
+      items[index + 1].after(item);
+      save_order(sibling_items(item));
+    });
+
+    if (item.dataset.accent) {
+      add_button("🎨", "Cambiar color", async () => {
+        const current = item.dataset.accent!;
+        const next = accent_cycle[(accent_cycle.indexOf(current) + 1) % accent_cycle.length];
+        const { ok } = await patch_json({ endpoint, id, field: "accent_color" }, { accent_color: next });
+        if (!ok) return;
+        item.dataset.accent = next;
+        item.querySelectorAll<HTMLElement>(`.accent_${current}`).forEach((element) => element.classList.replace(`accent_${current}`, `accent_${next}`));
+        if (item.classList.contains(`accent_${current}`)) item.classList.replace(`accent_${current}`, `accent_${next}`);
+        else item.classList.add(`accent_${next}`);
+        toast("Color cambiado");
+      });
+    }
+
+    add_button("🗑", `Eliminar ${label}`, async () => {
+      if (!window.confirm(`¿Eliminar este ${label}? Esta acción no se puede deshacer.`)) return;
+      const { ok } = await api(resource_path(endpoint, id), { method: "DELETE" });
+      if (!ok) return;
+      item.remove();
+      toast("Eliminado");
+    }, "is_danger");
+
+    item.append(toolbar);
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-edit-item]").forEach(build_toolbar);
+
+  // Agregar elementos
+  document.querySelectorAll<HTMLButtonElement>("[data-edit-add]").forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      const defaults = JSON.parse(button.dataset.defaults ?? "{}");
+      const { ok } = await api(`${button.dataset.editAdd}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(defaults),
+      });
+      button.disabled = false;
+      if (ok) {
+        toast("Agregado (sin publicar)");
+        reload_preserving_scroll();
+      }
+    });
+  });
+
+  // --- Secciones ---------------------------------------------------------------------
+
+  document.querySelectorAll<HTMLElement>("[data-edit-section]").forEach((section) => {
+    const bar = document.createElement("div");
+    bar.className = "editor_ui editor_section_bar";
+    const name = document.createElement("strong");
+    name.textContent = section.dataset.editLabel ?? "Sección";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    const update = () => {
+      const visible = section.dataset.visible === "true";
+      toggle.textContent = visible ? "Visible en el sitio" : "Sección oculta";
+      toggle.classList.toggle("is_off", !visible);
+      toggle.title = visible ? "Clic para ocultar la sección del sitio" : "Clic para mostrar la sección en el sitio";
+    };
+    toggle.addEventListener("click", async () => {
+      const next = section.dataset.visible !== "true";
+      const { ok } = await patch_json({ endpoint: section.dataset.editSection!, id: null, field: "is_visible" }, { is_visible: next });
+      if (!ok) return;
+      section.dataset.visible = String(next);
+      update();
+      toast(next ? "Sección visible en el sitio" : "Sección oculta del sitio");
+    });
+    update();
+    bar.append(name, toggle);
+    section.prepend(bar);
+  });
+
+  window.parent?.postMessage({ type: "page_editor_ready" }, window.location.origin);
+</script>
+
+<style is:global>
+  /* --- Zonas editables --- */
+  .is_page_editor [data-edit-text] {
+    outline: 1px dashed transparent; outline-offset: 2px; cursor: text; min-width: 2ch;
+    transition: outline-color 0.15s, background 0.15s; border-radius: 2px;
+  }
+  .is_page_editor [data-edit-text]:hover { outline-color: rgba(28, 99, 168, 0.65); }
+  .is_page_editor [data-edit-text]:focus { outline: 2px solid #1c63a8; background: rgba(255, 244, 204, 0.35); }
+  .is_page_editor [data-edit-text]:empty::before { content: attr(data-placeholder); opacity: 0.45; font-style: italic; }
+  .is_page_editor [data-edit-text].is_saving { outline: 2px solid #f2b705; }
+  .is_page_editor [data-edit-text].is_saved { outline: 2px solid #1e8f5e; }
+  .is_page_editor .eyebrow[data-edit-text]:empty::before { width: auto; height: auto; background: none; content: attr(data-placeholder); }
+  .is_page_editor [data-edit-image] { outline: 1px dashed transparent; outline-offset: -2px; }
+  .is_page_editor [data-edit-image]:hover { outline-color: rgba(242, 183, 5, 0.9); }
+  .is_page_editor img[data-edit-image] { cursor: pointer; }
+  .is_page_editor [data-edit-item] { position: relative; }
+  .is_page_editor [data-published="false"] > :not(.editor_item_toolbar) { opacity: 0.45; }
+  .is_page_editor [data-edit-section] { position: relative; }
+  .is_page_editor [data-edit-section][data-visible="false"] > .wrap { opacity: 0.4; }
+  .is_page_editor .is_empty_link { opacity: 0.45; }
+
+  /* --- Controles del editor --- */
+  .editor_ui { font: 500 13px/1.3 "Inter", system-ui, sans-serif; color: #12202b; }
+  .editor_ui button { font: inherit; cursor: pointer; }
+  .editor_float {
+    position: absolute; z-index: 1000; display: inline-flex; gap: 2px; padding: 3px;
+    background: #12202b; border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+  .editor_float[hidden] { display: none; }
+  .editor_float button, .editor_link_button {
+    border: 0; background: transparent; color: #fff; padding: 6px 10px; border-radius: 4px; white-space: nowrap;
+  }
+  .editor_float button:hover, .editor_link_button:hover { background: rgba(255, 255, 255, 0.14); }
+  .editor_link_popover {
+    position: absolute; z-index: 1001; width: 330px; padding: 14px; display: grid; gap: 10px;
+    background: #fff; border: 1px solid #dcd8cc; border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+  .editor_link_popover[hidden] { display: none; }
+  .editor_link_popover label { display: grid; gap: 6px; font-weight: 600; }
+  .editor_link_popover input { font: 400 14px "Inter", sans-serif; padding: 8px 10px; border: 1px solid #dcd8cc; border-radius: 4px; }
+  .editor_popover_actions { display: flex; gap: 8px; }
+  .editor_popover_actions button { padding: 7px 14px; border-radius: 4px; border: 1px solid #12202b; background: #fff; }
+  .editor_popover_actions button[type="submit"] { background: #12202b; color: #fff; }
+  .editor_hint { margin: 0; color: #5b6670; font-size: 12px; }
+  .editor_item_toolbar {
+    position: absolute; top: 6px; right: 6px; z-index: 40; display: flex; gap: 2px; padding: 3px;
+    background: #12202b; border-radius: 6px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    opacity: 0; pointer-events: none; transition: opacity 0.15s;
+  }
+  [data-edit-item]:hover > .editor_item_toolbar, [data-edit-item]:focus-within > .editor_item_toolbar,
+  [data-published="false"] > .editor_item_toolbar { opacity: 1; pointer-events: auto; }
+  .editor_item_toolbar button { border: 0; background: transparent; color: #fff; padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
+  .editor_item_toolbar button:hover { background: rgba(255, 255, 255, 0.16); }
+  .editor_item_toolbar .is_publish { color: #7fe0b0; }
+  .editor_item_toolbar .is_publish.is_off { color: #f2b705; }
+  .editor_item_toolbar .is_danger:hover { background: #b42318; }
+  .editor_section_bar {
+    position: absolute; top: 12px; left: 12px; z-index: 50; display: flex; align-items: center; gap: 8px;
+    padding: 4px 4px 4px 10px; background: rgba(18, 32, 43, 0.92); color: #fff; border-radius: 6px;
+  }
+  .editor_section_bar strong { font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; }
+  .editor_section_bar button { border: 0; border-radius: 4px; padding: 4px 10px; background: #1e8f5e; color: #fff; }
+  .editor_section_bar button.is_off { background: #f2b705; color: #12202b; }
+  .editor_toasts { position: fixed; right: 16px; bottom: 16px; z-index: 1100; display: grid; gap: 8px; }
+  .editor_toast {
+    padding: 10px 14px; border-radius: 6px; color: #fff; background: #1e8f5e;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 360px;
+  }
+  .editor_toast.is_error { background: #b42318; }
+  .editor_toast.is_info { background: #12202b; }
+</style>

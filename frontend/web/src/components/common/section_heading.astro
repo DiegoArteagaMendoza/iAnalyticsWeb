@@ -1,0 +1,90 @@
+---
+/** Encabezado estándar de sección: etiqueta, título en dos líneas, párrafo y enlace. */
+import { edit_link, edit_text } from "../../lib/edit_attrs";
+
+interface Props {
+  eyebrow?: string;
+  title_line_1?: string;
+  title_line_2?: string;
+  body?: string;
+  cta_text?: string;
+  cta_url?: string;
+  eyebrow_color?: "yellow" | "green" | "blue";
+  cta_style?: "link" | "button";
+  heading_id?: string;
+  /** Modo edición del panel: endpoint de la sección (ej. "about_section") */
+  editing?: boolean;
+  endpoint?: string;
+  /** false si la sección no tiene botón */
+  has_cta?: boolean;
+}
+
+const {
+  eyebrow,
+  title_line_1,
+  title_line_2,
+  body,
+  cta_text,
+  cta_url,
+  eyebrow_color = "yellow",
+  cta_style = "link",
+  heading_id,
+  editing = false,
+  endpoint = "",
+  has_cta = true,
+} = Astro.props;
+const target = (field: string) => [endpoint, null, field] as [string, null, string];
+const show_cta = has_cta && (editing || Boolean(cta_text && cta_url));
+const has_side = Boolean(editing || body || show_cta || Astro.slots.has("default"));
+---
+
+<div class="section_heading reveal">
+  <div>
+    {
+      (editing || eyebrow) && (
+        <div class="eyebrow" style={`--eyebrow_color: var(--${eyebrow_color})`} {...edit_text(editing, target("eyebrow"), { placeholder: "Etiqueta" })}>
+          {eyebrow}
+        </div>
+      )
+    }
+    <h2 id={heading_id}>
+      <span {...edit_text(editing, target("title_line_1"), { placeholder: "Título" })}>{title_line_1}</span>
+      {
+        (editing || title_line_2) && (
+          <span class="title_line_2" {...edit_text(editing, target("title_line_2"), { placeholder: "Segunda línea del título" })}>
+            {title_line_2}
+          </span>
+        )
+      }
+    </h2>
+  </div>
+  {
+    has_side && (
+      <div>
+        {(editing || body) && <p {...edit_text(editing, target("body"), { multiline: true, placeholder: "Párrafo" })}>{body}</p>}
+        {show_cta && (
+          <a
+            class:list={cta_style === "button" ? "btn btn_primary arrow" : "link arrow"}
+            href={cta_url || "#"}
+            {...edit_text(editing, target("cta_text"), { placeholder: "Texto del enlace" })}
+            {...edit_link(editing, target("cta_url"))}
+          >
+            {cta_text}
+          </a>
+        )}
+        <slot />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .section_heading { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: end; margin-bottom: 56px; }
+  h2 { font-size: clamp(2rem, 4vw, 3rem); }
+  h2 > span:first-child { display: block; }
+  .title_line_2 { display: block; color: var(--title_line_2_color, var(--muted)); font-weight: 500; }
+  p { color: var(--body_color, var(--muted)); margin-bottom: 20px; max-width: 52ch; }
+  @media (max-width: 860px) {
+    .section_heading { grid-template-columns: 1fr; gap: 20px; }
+  }
+</style>

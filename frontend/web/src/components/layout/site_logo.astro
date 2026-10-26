@@ -1,0 +1,51 @@
+---
+import { edit_image } from "../../lib/edit_attrs";
+import type { SiteSettings } from "../../lib/types";
+
+interface Props {
+  site_settings: SiteSettings;
+  href: string;
+  label: string;
+  variant?: "light_background" | "dark_background";
+  class?: string;
+  editing?: boolean;
+}
+
+const { site_settings, href, label, variant = "light_background", class: class_name, editing = false } = Astro.props;
+const mark_url = site_settings.logo_mark || "/brand/logo_mark.png";
+const wordmark_field = variant === "dark_background" ? "logo_wordmark_light" : "logo_wordmark";
+const wordmark_url =
+  variant === "dark_background"
+    ? site_settings.logo_wordmark_light || "/brand/logo_wordmark_light.png"
+    : site_settings.logo_wordmark || "/brand/logo_wordmark.png";
+---
+
+<a href={href} class:list={["logo", class_name]} aria-label={label}>
+  <img
+    class="logo_mark"
+    src={mark_url}
+    alt=""
+    width="183"
+    height="160"
+    {...edit_image(editing, ["site_settings", null, "logo_mark"], "Símbolo del logo")}
+  />
+  <img
+    class="logo_word"
+    src={wordmark_url}
+    alt={site_settings.company_name}
+    width="741"
+    height="40"
+    {...edit_image(editing, ["site_settings", null, wordmark_field], variant === "dark_background" ? "Texto del logo (fondo oscuro)" : "Texto del logo")}
+  />
+</a>
+
+<style>
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+  .logo_mark { height: 46px; width: auto; transition: height 0.2s ease-in-out; }
+  .logo_word { height: 14px; width: auto; }
+  :global(.is_compact) .logo_mark { height: 38px; }
+  @media (max-width: 480px) {
+    .logo_mark { height: 38px; }
+    .logo_word { height: 11px; }
+  }
+</style>

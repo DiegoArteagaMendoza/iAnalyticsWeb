@@ -1,0 +1,11 @@
+[mysqld]
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+default-time-zone = '+00:00'
+skip-name-resolve
+max_connections = 100
+# Tamaño máximo de una consulta (textos largos y cargas grandes)
+max_allowed_packet = 64M
+
+[client]
+default-character-set = utf8mb4

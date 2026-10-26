@@ -1,0 +1,75 @@
+---
+/**
+ * Página de inicio completa en un idioma.
+ * - Sitio público: src/pages/index.astro (es) y src/pages/en/index.astro (en).
+ * - Editor del panel: src/pages/panel/vista_previa.astro (editing=true, con contenido no publicado).
+ */
+import BaseLayout from "../layouts/base_layout.astro";
+import { get_page_content } from "../lib/content_api";
+import { default_language, get_ui, type Language } from "../lib/i18n";
+import type { PageContent } from "../lib/types";
+import PageEditor from "./editor/page_editor.astro";
+import SiteFooter from "./layout/site_footer.astro";
+import SiteHeader from "./layout/site_header.astro";
+import TranslationNotice from "./layout/translation_notice.astro";
+import AboutSection from "./sections/about_section.astro";
+import ClientsSection from "./sections/clients_section.astro";
+import ContactSection from "./sections/contact_section.astro";
+import CtaBanner from "./sections/cta_banner.astro";
+import DataCapabilitiesSection from "./sections/data_capabilities_section.astro";
+import HeroSection from "./sections/hero_section.astro";
+import ServicesSection from "./sections/services_section.astro";
+import TeamSection from "./sections/team_section.astro";
+import TechnologiesSection from "./sections/technologies_section.astro";
+
+interface Props {
+  language: Language;
+  /** Contenido ya obtenido (editor); si no se entrega, se pide al backend */
+  content?: PageContent;
+  editing?: boolean;
+}
+
+const { language, editing = false } = Astro.props;
+const ui = get_ui(language);
+const content = Astro.props.content ?? (await get_page_content(language)).content;
+const { site_settings, hero, about, team, services, data_capabilities, technologies, clients, contact } = content;
+
+const has_team = editing || Boolean(team && (team.founders.length || team.members.length));
+const has_clients = editing || Boolean(clients && (clients.items.length || clients.testimonials.length || clients.certifications.length));
+const submission_status = editing ? null : Astro.url.searchParams.get("contact");
+---
+
+<BaseLayout language={language} html_lang={ui.html_lang} og_locale={ui.og_locale} site_settings={site_settings} no_index={editing}>
+  <a class="skip_link" href="#contenido">{ui.skip_to_content}</a>
+  <SiteHeader language={language} content={content} editing={editing} />
+  <main id="contenido">
+    <HeroSection hero={hero} editing={editing} />
+    {about && <AboutSection about={about} language={language} editing={editing} />}
+    {has_team && team && <TeamSection team={team} language={language} editing={editing} />}
+    {services && (editing || services.items.length > 0) && <ServicesSection services={services} editing={editing} />}
+    {data_capabilities && <DataCapabilitiesSection data_capabilities={data_capabilities} language={language} editing={editing} />}
+    {
+      technologies && (editing || technologies.items.length > 0) && (
+        <TechnologiesSection technologies={technologies} language={language} editing={editing} />
+      )
+    }
+    {has_clients && clients && <ClientsSection clients={clients} language={language} editing={editing} />}
+    {
+      contact && (editing || contact.banner_title) && (
+        <CtaBanner title={contact.banner_title} button_text={contact.banner_button_text} button_url="#contacto" editing={editing} />
+      )
+    }
+    {
+      contact && (
+        <ContactSection contact={contact} site_settings={site_settings} language={language} submission_status={submission_status} editing={editing} />
+      )
+    }
+  </main>
+  <SiteFooter language={language} content={content} editing={editing} />
+  {
+    !editing && language !== default_language && site_settings.translation_notice && (
+      <TranslationNotice message={site_settings.translation_notice} action_label={ui.translation_notice_action} close_label={ui.close} />
+    )
+  }
+  {editing && <PageEditor language={language} />}
+</BaseLayout>

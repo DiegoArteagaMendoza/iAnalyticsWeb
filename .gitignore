@@ -1,0 +1,87 @@
+# =============================================================
+#  iAnalytics · monorepo
+# =============================================================
+
+# --- Variables de entorno y secretos ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Pruebas y cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# --- Django (backend/) ---
+backend/db.sqlite3
+backend/db.sqlite3-journal
+*.sqlite3
+# Archivos subidos desde el panel (imágenes, documentos)
+backend/media/
+# Resultado de collectstatic
+backend/staticfiles/
+*.log
+
+# --- Frontend (frontend/) ---
+node_modules/
+.npm/
+# Tipos generados por Astro
+.astro/
+.vite/
+.next/
+.nuxt/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Docker ---
+compose.override.yaml
+docker-compose.override.yml
+.docker/
+# Respaldos de la base de datos (scripts/backup_database.sh).
+# Los paquetes de imágenes exportadas van a dist/, ya ignorado más arriba.
+backups/
+
+# --- Editores e IDE ---
+# Configuración personal de VS Code (colores de Peacock, etc.)
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Claude Code: permisos locales de esta máquina ---
+.claude/settings.local.json
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.directory

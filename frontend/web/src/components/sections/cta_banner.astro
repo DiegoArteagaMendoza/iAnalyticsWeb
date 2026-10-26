@@ -1,0 +1,31 @@
+---
+import { edit_text } from "../../lib/edit_attrs";
+
+interface Props {
+  title: string;
+  button_text: string;
+  button_url: string;
+  editing?: boolean;
+}
+
+const { title, button_text, button_url, editing = false } = Astro.props;
+---
+
+<section class="cta_banner" aria-label={title}>
+  <div class="wrap">
+    <h2 {...edit_text(editing, ["contact_section", null, "banner_title"], { placeholder: "Frase de cierre" })}>{title}</h2>
+    {
+      (editing || button_text) && (
+        <a class="btn btn_dark arrow" href={button_url} {...edit_text(editing, ["contact_section", null, "banner_button_text"], { placeholder: "Botón" })}>
+          {button_text}
+        </a>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .cta_banner { background: var(--yellow); color: var(--base); padding: 88px 0; }
+  .wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  h2 { font-size: clamp(2rem, 4vw, 3rem); max-width: 18ch; }
+</style>

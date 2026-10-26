@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+# Imagen de la base de datos de iAnalytics (MySQL 8.4 LTS)
+FROM mysql:8.4
+
+LABEL org.opencontainers.image.title="ianalytics_database" \
+      org.opencontainers.image.description="Base de datos MySQL del sitio de Informatic Analytics" \
+      org.opencontainers.image.vendor="Informatic Analytics"
+
+# utf8mb4 para tildes, eñes y emojis; zona horaria y ajustes de conexión
+COPY --chmod=644 conf/ianalytics.cnf /etc/mysql/conf.d/ianalytics.cnf
+
+# MYSQL_ROOT_PASSWORD, MYSQL_DATABASE, MYSQL_USER y MYSQL_PASSWORD se entregan al iniciar
+# el contenedor (ver compose.yaml). Los datos viven en el volumen /var/lib/mysql.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=10 \
+    CMD mysqladmin ping --host=127.0.0.1 --user=root --password="$MYSQL_ROOT_PASSWORD" --silent || exit 1

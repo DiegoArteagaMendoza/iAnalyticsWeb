@@ -1,0 +1,80 @@
+---
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/bitter/700.css";
+import "../../styles/global.css";
+
+import { get_session_token, get_session_user, login, save_session } from "../../lib/panel_api";
+
+const { request, cookies, url, redirect, clientAddress } = Astro;
+
+// Solo se permite volver a páginas del propio panel
+const requested_next = url.searchParams.get("next") ?? "";
+const next_path = /^\/panel(\/[a-z_/]*)?$/.test(requested_next) ? requested_next : "/panel/";
+
+let error_message = "";
+let username = "";
+
+if (request.method === "POST") {
+  const form = await request.formData();
+  username = String(form.get("username") ?? "").trim();
+  const password = String(form.get("password") ?? "");
+  if (!username || !password) {
+    error_message = "Ingrese su usuario y contraseña.";
+  } else {
+    const trust_forwarded_for = process.env.TRUST_FORWARDED_FOR === "true";
+    const visitor = (trust_forwarded_for && request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()) || clientAddress;
+    const result = await login(username, password, visitor);
+    if ("token" in result) {
+      save_session(cookies, url, result.token);
+      return redirect(next_path, 303);
+    }
+    error_message = result.error;
+  }
+} else {
+  const token = get_session_token(cookies);
+  if (token && (await get_session_user(token))) return redirect(next_path, 302);
+}
+
+Astro.response.headers.set("Cache-Control", "no-store");
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Ingresar · Panel iAnalytics</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+  </head>
+  <body class="login_body">
+    <main class="login_card">
+      <img src="/brand/logo_mark.png" alt="" width="64" height="56" />
+      <h1>Panel de administración</h1>
+      <p class="subtitle">Informatic Analytics</p>
+      <form method="post">
+        {error_message && <p class="error" role="alert">{error_message}</p>}
+        <label>Usuario o correo<input type="text" name="username" value={username} autocomplete="username" required autofocus /></label>
+        <label>Contraseña<input type="password" name="password" autocomplete="current-password" required /></label>
+        <button class="btn btn_primary" type="submit">Ingresar</button>
+      </form>
+      <a class="back" href="/">← Volver al sitio</a>
+    </main>
+  </body>
+</html>
+
+<style>
+  .login_body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--base); padding: 24px; }
+  .login_card { width: min(400px, 100%); background: var(--paper); border-radius: 12px; padding: 40px 32px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); text-align: center; }
+  img { margin: 0 auto 16px; height: 56px; width: auto; }
+  h1 { font-size: 1.5rem; }
+  .subtitle { color: var(--muted); margin: 4px 0 28px; }
+  form { display: grid; gap: 16px; text-align: left; }
+  label { display: grid; gap: 6px; font-size: 0.88rem; font-weight: 600; }
+  input { font: inherit; font-weight: 400; padding: 0.75rem 0.9rem; border: 1px solid var(--line); border-radius: 6px; }
+  input:focus { outline: 2px solid var(--blue); border-color: var(--blue); }
+  .btn { justify-content: center; border-radius: 6px; margin-top: 4px; }
+  .error { margin: 0; padding: 10px 12px; border-radius: 6px; background: #fdecea; color: #b42318; font-size: 0.9rem; }
+  .back { display: inline-block; margin-top: 24px; color: var(--muted); font-size: 0.9rem; }
+</style>

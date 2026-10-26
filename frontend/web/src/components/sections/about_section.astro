@@ -1,0 +1,94 @@
+---
+import { edit_item, edit_section, edit_text } from "../../lib/edit_attrs";
+import { get_ui, type Language } from "../../lib/i18n";
+import type { AboutSection } from "../../lib/types";
+import SectionHeading from "../common/section_heading.astro";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  about: AboutSection;
+  language: Language;
+  editing?: boolean;
+}
+
+const { about, language, editing = false } = Astro.props;
+const ui = get_ui(language);
+const target = (field: string) => ["about_section", null, field] as [string, null, string];
+const value_target = (id: number, field: string) => ["company_values", id, field] as [string, number, string];
+const value_count = about.values.length + (editing ? 1 : 0);
+---
+
+<section class="about" id="nosotros" aria-labelledby="about_title" {...edit_section(editing, "about_section", about.is_visible, "Nosotros")}>
+  <div class="wrap">
+    <SectionHeading {...about} eyebrow_color="green" heading_id="about_title" editing={editing} endpoint="about_section" />
+
+    {
+      (editing || about.mission || about.vision) && (
+        <div class="mission_vision reveal">
+          {(editing || about.mission) && (
+            <article class="statement accent_yellow">
+              <h3>{ui.about.mission}</h3>
+              <p {...edit_text(editing, target("mission"), { multiline: true, placeholder: "Misión" })}>{about.mission}</p>
+            </article>
+          )}
+          {(editing || about.vision) && (
+            <article class="statement accent_green">
+              <h3>{ui.about.vision}</h3>
+              <p {...edit_text(editing, target("vision"), { multiline: true, placeholder: "Visión" })}>{about.vision}</p>
+            </article>
+          )}
+        </div>
+      )
+    }
+
+    {
+      value_count > 0 && (
+        <ul class="values reveal" aria-label={ui.about.values_aria} style={`--value_columns: ${Math.min(value_count, 4)}`}>
+          {about.values.map((value) => (
+            <li
+              class={`value accent_${value.accent_color}`}
+              {...edit_item(editing, "company_values", value.id, { is_published: value.is_published, accent_color: value.accent_color, label: "valor" })}
+            >
+              <span class="dot" aria-hidden="true" />
+              <b {...edit_text(editing, value_target(value.id, "name"), { placeholder: "Valor" })}>{value.name}</b>
+              {(editing || value.description) && (
+                <span class="value_description" {...edit_text(editing, value_target(value.id, "description"), { placeholder: "Descripción" })}>
+                  {value.description}
+                </span>
+              )}
+            </li>
+          ))}
+          {editing && (
+            <li class="value add_value">
+              <EditAddButton endpoint="company_values" label="Valor" defaults={{ name_es: "Nuevo valor", description_es: "Descripción del valor.", accent_color: "yellow", order: about.values.length }} />
+            </li>
+          )}
+        </ul>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .about { background: var(--paper); }
+  .mission_vision { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .statement { padding: 40px; background: var(--surface); border-top: 4px solid var(--accent); }
+  .statement h3 { font-size: 1.5rem; margin-bottom: 12px; }
+  .statement p { color: var(--muted); }
+  .values {
+    list-style: none; padding: 0; margin: 24px 0 0; border: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(var(--value_columns), 1fr);
+  }
+  .value { padding: 28px 24px; border-right: 1px solid var(--line); }
+  .value:last-child { border-right: 0; }
+  .value b { display: block; font-family: var(--serif); font-size: 1.2rem; margin-bottom: 6px; }
+  .value_description { display: block; font-size: 0.92rem; color: var(--muted); }
+  .dot { display: block; width: 12px; height: 12px; border-radius: 50%; margin-bottom: 16px; background: var(--accent); }
+  .add_value { display: flex; align-items: center; }
+  @media (max-width: 860px) {
+    .values { grid-template-columns: 1fr 1fr; }
+    .value { border-bottom: 1px solid var(--line); }
+    .value:nth-child(2n) { border-right: 0; }
+  }
+  @media (max-width: 480px) { .statement { padding: 28px; } }
+</style>

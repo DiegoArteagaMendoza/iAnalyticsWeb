@@ -1,0 +1,466 @@
+{
+  "ui": {
+    "html_lang": "es-CL",
+    "og_locale": "es_CL",
+    "language_name": "Español",
+    "skip_to_content": "Saltar al contenido",
+    "home_aria": "Informatic Analytics, inicio",
+    "main_nav_aria": "Principal",
+    "open_menu": "Abrir menú",
+    "close_menu": "Cerrar menú",
+    "language_aria": "Idioma",
+    "nav": {
+      "about": "Nosotros",
+      "team": "Equipo",
+      "services": "Servicios",
+      "clients": "Clientes",
+      "technologies": "Tecnologías",
+      "contact": "Contacto"
+    },
+    "header_cta": "Conversemos",
+    "translation_notice_action": "Ver en español",
+    "close": "Cerrar",
+    "about": {
+      "mission": "Misión",
+      "vision": "Visión",
+      "values_aria": "Nuestros valores"
+    },
+    "team": {
+      "linkedin_of": "LinkedIn de {name}"
+    },
+    "data": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "carousel_aria": "Capacidades de datos"
+    },
+    "technologies": {
+      "development_aria": "Tecnologías de desarrollo",
+      "data_aria": "Tecnologías de datos"
+    },
+    "clients": {
+      "logos_aria": "Logos de clientes"
+    },
+    "contact": {
+      "address": "Dirección",
+      "email": "E-mail",
+      "phone": "Teléfono",
+      "hours": "Horario",
+      "form": {
+        "name": "Nombre",
+        "company": "Empresa",
+        "email": "E-mail",
+        "phone": "Teléfono",
+        "service": "Servicio de interés",
+        "message": "Mensaje",
+        "sending": "Enviando…",
+        "error": "No pudimos enviar su mensaje. Intente nuevamente o escríbanos a {email}.",
+        "rate_limited": "Ha enviado varios mensajes seguidos. Intente nuevamente más tarde.",
+        "invalid": "Revise los campos marcados e intente nuevamente."
+      }
+    },
+    "footer": {
+      "company": "Empresa",
+      "services": "Servicios",
+      "contact": "Contacto",
+      "social_aria": "Redes sociales"
+    },
+    "not_found": {
+      "title": "Página no encontrada",
+      "body": "La página que busca no existe o fue movida.",
+      "back": "Volver al inicio"
+    }
+  },
+  "content": {
+    "site_settings": {
+      "company_name": "Informatic Analytics",
+      "logo_mark": "/media/site_settings/logo_mark.png",
+      "logo_wordmark": "/media/site_settings/logo_wordmark.png",
+      "logo_wordmark_light": "/media/site_settings/logo_wordmark_light.png",
+      "logo_full": "/media/site_settings/logo_full.png",
+      "favicon": "/media/site_settings/favicon.png",
+      "phone_display": "42-225 20 35",
+      "phone_link": "+56422252035",
+      "email": "contacto@ianalytics.cl",
+      "address": "Constitución 162, Chillán",
+      "maps_url": "https://goo.gl/maps/p57mE1qcWAjyYgaTA",
+      "linkedin_url": "",
+      "facebook_url": "",
+      "instagram_url": "",
+      "youtube_url": "",
+      "meta_title": "iAnalytics | Soluciones informáticas en Chillán",
+      "meta_description": "iAnalytics: desarrollo de aplicaciones a medida, asesorías TI e inteligencia de negocios desde Chillán, Región de Ñuble.",
+      "business_hours": "Lunes a viernes, 9:00 a 18:00 hrs",
+      "footer_tagline": "Soluciones informáticas de excelencia desde Chillán, Región de Ñuble.",
+      "translation_notice": "Esta versión fue traducida automáticamente."
+    },
+    "hero": {
+      "primary_cta_url": "#contacto",
+      "secondary_cta_url": "#servicios",
+      "background_image": null,
+      "eyebrow": "Informatic Analytics · Chillán",
+      "title_line_1": "No solo desarrollamos software.",
+      "title_line_2": "Creamos soluciones que funcionan.",
+      "lead": "Transformación digital, aplicaciones web y mobile e inteligencia de negocios para que su empresa crezca, con relaciones de largo plazo basadas en el respeto, la seriedad y la confianza.",
+      "primary_cta_text": "Conversemos",
+      "secondary_cta_text": "Ver servicios",
+      "highlights": [
+        {
+          "id": 1,
+          "accent_color": "yellow",
+          "text": "Transformación Digital"
+        },
+        {
+          "id": 2,
+          "accent_color": "green",
+          "text": "Aplicaciones Web y Mobile"
+        },
+        {
+          "id": 3,
+          "accent_color": "blue",
+          "text": "Inteligencia de Negocios"
+        }
+      ]
+    },
+    "about": {
+      "cta_url": "#contacto",
+      "eyebrow": "Quiénes somos",
+      "title_line_1": "Nacimos en Chillán",
+      "title_line_2": "para crecer junto a su empresa",
+      "body": "Somos una empresa de la ciudad de Chillán, capital de la Región de Ñuble. Proveemos soluciones informáticas de excelencia y nos preocupamos de construir lazos de largo plazo con nuestros clientes.",
+      "cta_text": "Escríbanos",
+      "mission": "Proporcionar a nuestros clientes compromiso y seriedad para entregarles soluciones con altos estándares de calidad. Procuramos con todo el entorno, especialmente clientes y colaboradores, relaciones de largo plazo, basadas en la confianza y respeto mutuo.",
+      "vision": "Aspiramos a ser una empresa sólida y en constante crecimiento. Buscamos ser referente en nuestra área y cultivamos la colaboración, respeto, seriedad y confianza entre clientes y proveedores.",
+      "values": [
+        {
+          "id": 1,
+          "accent_color": "yellow",
+          "name": "Honestidad",
+          "description": "Transparencia en cada etapa del proyecto."
+        },
+        {
+          "id": 2,
+          "accent_color": "green",
+          "name": "Profesionalismo",
+          "description": "Equipo experto y procesos rigurosos."
+        },
+        {
+          "id": 3,
+          "accent_color": "blue",
+          "name": "Compromiso",
+          "description": "Nos hacemos cargo hasta el final."
+        },
+        {
+          "id": 4,
+          "accent_color": "base",
+          "name": "Servicio personalizado",
+          "description": "Soluciones pensadas para su negocio."
+        }
+      ]
+    },
+    "team": {
+      "cta_url": "",
+      "eyebrow": "Nuestro equipo",
+      "title_line_1": "Las personas detrás",
+      "title_line_2": "de cada solución",
+      "body": "Un equipo de profesionales de Ñuble que combina desarrollo de software, consultoría y análisis de datos para acompañar a su empresa en cada etapa.",
+      "cta_text": "",
+      "founders_label": "Fundadores",
+      "members_label": "Equipo",
+      "founders": [],
+      "members": []
+    },
+    "services": {
+      "cta_url": "#contacto",
+      "eyebrow": "Servicios",
+      "title_line_1": "Tecnología a la medida",
+      "title_line_2": "de cada desafío",
+      "body": "Desde una aplicación web hasta la estrategia de datos de toda la organización: ayudamos a optimizar el uso de sus recursos y maximizar sus utilidades.",
+      "cta_text": "Cuéntenos su proyecto",
+      "items": [
+        {
+          "id": 1,
+          "link_url": "#tecnologias",
+          "accent_color": "yellow",
+          "features": [
+            {
+              "id": 1,
+              "text": "Desarrollo integral de aplicaciones web interactivas y seguras."
+            },
+            {
+              "id": 2,
+              "text": "Código desarrollado por profesionales."
+            },
+            {
+              "id": 3,
+              "text": "Alojamiento en el servidor adecuado, mantención y soporte."
+            },
+            {
+              "id": 4,
+              "text": "Aplicaciones web con diseño personalizado."
+            }
+          ],
+          "tag": "Desarrollo",
+          "title": "Aplicaciones a Medida",
+          "menu_description": "Web y mobile, desde el diseño hasta el soporte",
+          "description": "Desarrollamos aplicaciones a medida usando diferentes lenguajes de programación.",
+          "link_text": "Ver tecnologías"
+        },
+        {
+          "id": 2,
+          "link_url": "#contacto",
+          "accent_color": "green",
+          "features": [
+            {
+              "id": 5,
+              "text": "Seguridad de la información."
+            },
+            {
+              "id": 6,
+              "text": "Consultoría de procesos."
+            },
+            {
+              "id": 7,
+              "text": "Requerimientos comerciales y de arquitectura TI."
+            },
+            {
+              "id": 8,
+              "text": "Transformación digital."
+            },
+            {
+              "id": 9,
+              "text": "Consultoría estratégica."
+            }
+          ],
+          "tag": "Consultoría",
+          "title": "Asesorías",
+          "menu_description": "Procesos, seguridad y transformación digital",
+          "description": "Asesoramos a empresas de distintos rubros para optimizar recursos y maximizar utilidades.",
+          "link_text": "Agendar una asesoría"
+        },
+        {
+          "id": 3,
+          "link_url": "#datos",
+          "accent_color": "blue",
+          "features": [
+            {
+              "id": 10,
+              "text": "Datawarehouse y Datamart."
+            },
+            {
+              "id": 11,
+              "text": "Modelamiento de datos relacional y multidimensional."
+            },
+            {
+              "id": 12,
+              "text": "Reportería e informes gerenciales."
+            },
+            {
+              "id": 13,
+              "text": "Data Mining y Data Analytics."
+            }
+          ],
+          "tag": "Datos",
+          "title": "Visibilidad de Datos",
+          "menu_description": "Datawarehouse, BI e informes gerenciales",
+          "description": "Damos mayor valor y visibilidad a sus datos para transformarlos en información y ventajas competitivas.",
+          "link_text": "Explorar capacidades"
+        }
+      ]
+    },
+    "data_capabilities": {
+      "cta_url": "#contacto",
+      "eyebrow": "La importancia de los datos",
+      "title_line_1": "Sus datos ya tienen respuestas.",
+      "title_line_2": "Nosotros las hacemos visibles.",
+      "body": "Colaboramos con las empresas para transformar sus datos en información y así lograr ventajas competitivas en sus respectivas áreas.",
+      "cta_text": "Hablemos de sus datos",
+      "items": [
+        {
+          "id": 1,
+          "title": "Datawarehouse",
+          "description": "Diseño y construcción de Datawarehouse."
+        },
+        {
+          "id": 2,
+          "title": "Modelamiento de Datos",
+          "description": "Diseño y construcción de modelos de datos relacionales y multidimensionales."
+        },
+        {
+          "id": 3,
+          "title": "Datamart",
+          "description": "Diseño y construcción de Datamart."
+        },
+        {
+          "id": 4,
+          "title": "Multiplataformas",
+          "description": "Integración en un mismo proyecto de múltiples plataformas de desarrollo."
+        },
+        {
+          "id": 5,
+          "title": "Informes",
+          "description": "Diseño y construcción de reportería e informes gerenciales."
+        },
+        {
+          "id": 6,
+          "title": "Data Mining & Analytics",
+          "description": "Descubrimiento de patrones y análisis avanzado de datos."
+        }
+      ]
+    },
+    "technologies": {
+      "cta_url": "",
+      "eyebrow": "Tecnologías",
+      "title_line_1": "Las herramientas correctas",
+      "title_line_2": "para cada proyecto",
+      "body": "Trabajamos con frameworks modernos de desarrollo y con las principales plataformas de bases de datos e inteligencia de negocios del mercado.",
+      "cta_text": "",
+      "development_label": "Desarrollo web y mobile",
+      "data_label": "Datos e inteligencia de negocios",
+      "items": [
+        {
+          "id": 9,
+          "name": "Teradata",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 10,
+          "name": "SQL Server",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 11,
+          "name": "Qlik",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 12,
+          "name": "Power BI",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 13,
+          "name": "Oracle",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 14,
+          "name": "MySQL",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 15,
+          "name": "MicroStrategy",
+          "category": "data",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 1,
+          "name": "Angular",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 2,
+          "name": "Flutter",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 3,
+          "name": "Ionic",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 4,
+          "name": "Node.js",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 5,
+          "name": "Python",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 6,
+          "name": "React",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 7,
+          "name": "Spring Boot",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        },
+        {
+          "id": 8,
+          "name": "Vue.js",
+          "category": "development",
+          "logo": null,
+          "website_url": ""
+        }
+      ]
+    },
+    "clients": {
+      "cta_url": "#contacto",
+      "eyebrow": "Clientes destacados",
+      "title_line_1": "Empresas que confían",
+      "title_line_2": "en nuestro trabajo",
+      "body": "Acompañamos a organizaciones de distintos rubros en su transformación digital y en la gestión de sus datos.",
+      "cta_text": "Sea nuestro próximo caso de éxito",
+      "items": [],
+      "testimonials": [],
+      "certifications": [
+        {
+          "id": 1,
+          "image": null,
+          "accent_color": "green",
+          "badge_text": "40 h",
+          "title": "Certificación 40 horas",
+          "issuer": "Ministerio del Trabajo y Previsión Social."
+        }
+      ]
+    },
+    "contact": {
+      "cta_url": "",
+      "eyebrow": "¿Cómo encontrarnos?",
+      "title_line_1": "Información de contacto",
+      "title_line_2": "",
+      "body": "Si tiene alguna duda o consulta, comuníquese con nosotros por cualquiera de nuestros medios o escríbanos un correo.",
+      "cta_text": "",
+      "banner_title": "Construyamos juntos la próxima etapa de su empresa.",
+      "banner_button_text": "Póngase en contacto",
+      "form_submit_text": "Enviar mensaje",
+      "form_success_message": "¡Gracias! Le responderemos a la brevedad.",
+      "form_other_option": "Otro",
+      "service_options": [
+        "Aplicaciones a Medida",
+        "Asesorías",
+        "Visibilidad de Datos"
+      ]
+    }
+  }
+}

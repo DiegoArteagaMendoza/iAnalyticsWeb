@@ -1,0 +1,172 @@
+---
+import { edit_text } from "../../lib/edit_attrs";
+import { get_ui, home_path, type Language } from "../../lib/i18n";
+import type { PageContent } from "../../lib/types";
+import LanguageSwitch from "./language_switch.astro";
+import SiteLogo from "./site_logo.astro";
+
+interface Props {
+  language: Language;
+  content: PageContent;
+  editing?: boolean;
+}
+
+const { language, content, editing = false } = Astro.props;
+const ui = get_ui(language);
+const { site_settings, services, team, clients, technologies, about, contact } = content;
+const has_team = editing || Boolean(team && (team.founders.length || team.members.length));
+const has_clients = editing || Boolean(clients && (clients.items.length || clients.testimonials.length || clients.certifications.length));
+const header_cta_url = contact ? "#contacto" : `mailto:${site_settings.email}`;
+---
+
+<header class="site_header" id="site_header">
+  <div class="wrap header_inner">
+    <SiteLogo site_settings={site_settings} href={home_path(language)} label={ui.home_aria} editing={editing} />
+
+    <nav class="main_nav" id="main_nav" aria-label={ui.main_nav_aria}>
+      {about && <a href="#nosotros">{ui.nav.about}</a>}
+      {has_team && <a href="#equipo">{ui.nav.team}</a>}
+      {
+        services && services.items.length > 0 && (
+          <div class="has_submenu">
+            <button type="button" aria-haspopup="true" aria-expanded="false">
+              {ui.nav.services} <span aria-hidden="true">▾</span>
+            </button>
+            <div class="submenu">
+              {services.items.map((service) => (
+                <a href={`#servicio_${service.id}`}>
+                  <strong>{service.title}</strong>
+                  {service.menu_description && <small>{service.menu_description}</small>}
+                </a>
+              ))}
+            </div>
+          </div>
+        )
+      }
+      {has_clients && <a href="#clientes">{ui.nav.clients}</a>}
+      {technologies && technologies.items.length > 0 && <a href="#tecnologias">{ui.nav.technologies}</a>}
+      {contact && <a href="#contacto">{ui.nav.contact}</a>}
+      {!editing && <LanguageSwitch language={language} label={ui.language_aria} class="language_in_menu" />}
+    </nav>
+
+    <div class="header_actions">
+      {(editing || site_settings.phone_display) && (
+        <a
+          class="phone"
+          href={`tel:${site_settings.phone_link || site_settings.phone_display}`}
+          {...edit_text(editing, ["site_settings", null, "phone_display"], { translatable: false, placeholder: "Teléfono" })}
+        >{site_settings.phone_display}</a>
+      )}
+      {!editing && <LanguageSwitch language={language} label={ui.language_aria} class="language_in_header" />}
+      <a class="btn btn_primary header_cta" href={header_cta_url}>{ui.header_cta}</a>
+      <button
+        class="menu_toggle"
+        id="menu_toggle"
+        type="button"
+        aria-controls="main_nav"
+        aria-expanded="false"
+        aria-label={ui.open_menu}
+        data-label_open={ui.open_menu}
+        data-label_close={ui.close_menu}
+      >☰</button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("site_header")!;
+  const menu = document.getElementById("main_nav")!;
+  const toggle = document.getElementById("menu_toggle") as HTMLButtonElement;
+
+  const update_compact = () => header.classList.toggle("is_compact", window.scrollY > 40);
+  window.addEventListener("scroll", update_compact, { passive: true });
+  update_compact();
+
+  const set_menu_open = (is_open: boolean) => {
+    menu.classList.toggle("is_open", is_open);
+    toggle.setAttribute("aria-expanded", String(is_open));
+    toggle.setAttribute("aria-label", (is_open ? toggle.dataset.label_close : toggle.dataset.label_open) ?? "");
+    toggle.textContent = is_open ? "✕" : "☰";
+    document.body.style.overflow = is_open ? "hidden" : "";
+    if (is_open) header.classList.add("is_compact");
+  };
+  toggle.addEventListener("click", () => set_menu_open(!menu.classList.contains("is_open")));
+  menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => set_menu_open(false)));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.classList.contains("is_open")) set_menu_open(false);
+  });
+
+  // Submenú de servicios accesible con teclado y táctil
+  document.querySelectorAll<HTMLElement>(".has_submenu").forEach((item) => {
+    const button = item.querySelector("button")!;
+    button.addEventListener("click", () => {
+      const is_open = item.classList.toggle("is_open");
+      button.setAttribute("aria-expanded", String(is_open));
+    });
+    item.addEventListener("focusout", (event) => {
+      if (!item.contains(event.relatedTarget as Node)) {
+        item.classList.remove("is_open");
+        button.setAttribute("aria-expanded", "false");
+      }
+    });
+  });
+</script>
+
+<style>
+  .site_header {
+    position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--header_height);
+    background: var(--paper); color: var(--base); border-bottom: 1px solid var(--line);
+    transition: height 0.2s ease-in-out, box-shadow 0.2s;
+  }
+  .site_header:global(.is_compact) { height: 64px; box-shadow: 0 4px 20px rgba(18, 32, 43, 0.12); }
+  .header_inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  .main_nav { display: flex; align-items: center; gap: 2px; }
+  .main_nav > a, .has_submenu > button {
+    color: var(--base); text-decoration: none; font: 500 0.95rem var(--sans); padding: 0.5rem 0.6rem;
+    background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+  }
+  .main_nav > a:hover, .has_submenu > button:hover { border-color: var(--yellow); }
+
+  .has_submenu { position: relative; }
+  .submenu {
+    position: absolute; top: calc(100% + 12px); left: -12px; width: 340px; padding: 12px;
+    background: var(--paper); color: var(--base); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all 0.2s ease;
+  }
+  .has_submenu:hover .submenu, .has_submenu:focus-within .submenu, .has_submenu:global(.is_open) .submenu {
+    opacity: 1; visibility: visible; transform: none;
+  }
+  .submenu a { display: block; padding: 12px; text-decoration: none; border-left: 3px solid transparent; }
+  .submenu a:hover { background: var(--surface); border-color: var(--yellow); }
+  .submenu strong { display: block; font-size: 0.95rem; }
+  .submenu small { color: var(--muted); font-size: 0.85rem; }
+
+  .header_actions { display: flex; align-items: center; gap: 16px; }
+  .phone { font-size: 0.9rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+  .phone:hover { color: var(--blue); }
+  .menu_toggle { display: none; background: none; border: 0; color: var(--base); font-size: 1.6rem; cursor: pointer; padding: 4px 8px; }
+  .main_nav :global(.language_in_menu) { display: none; }
+
+  @media (max-width: 1280px) { .phone { display: none; } }
+  @media (max-width: 1100px) {
+    .main_nav { display: none; }
+    .menu_toggle { display: block; }
+    .header_cta { display: none; }
+    .main_nav:global(.is_open) {
+      display: flex; position: fixed; inset: 64px 0 0 0; background: var(--paper);
+      flex-direction: column; align-items: stretch; padding: 24px 16px; gap: 0; overflow: auto;
+    }
+    .main_nav:global(.is_open) > a, .main_nav:global(.is_open) .has_submenu > button {
+      font-size: 1.25rem; padding: 1rem 0; border-bottom: 1px solid var(--line); text-align: left; width: 100%;
+    }
+    .main_nav:global(.is_open) .submenu {
+      position: static; opacity: 1; visibility: visible; transform: none; width: auto;
+      background: transparent; box-shadow: none; padding: 0 0 8px;
+    }
+  }
+  @media (max-width: 600px) {
+    .header_actions :global(.language_in_header) { display: none; }
+    .main_nav:global(.is_open) :global(.language_in_menu) { display: flex; align-self: flex-start; margin-top: 24px; }
+  }
+</style>

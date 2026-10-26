@@ -1,0 +1,105 @@
+---
+import { edit_link, edit_text } from "../../lib/edit_attrs";
+import { get_ui, home_path, type Language } from "../../lib/i18n";
+import type { PageContent } from "../../lib/types";
+import SiteLogo from "./site_logo.astro";
+
+interface Props {
+  language: Language;
+  content: PageContent;
+  editing?: boolean;
+}
+
+const { language, content, editing = false } = Astro.props;
+const ui = get_ui(language);
+const { site_settings, about, team, clients, technologies, services, contact } = content;
+const company_links = [
+  about && { href: "#nosotros", label: ui.nav.about },
+  team && (team.founders.length || team.members.length) && { href: "#equipo", label: ui.nav.team },
+  clients && { href: "#clientes", label: ui.nav.clients },
+  technologies && technologies.items.length && { href: "#tecnologias", label: ui.nav.technologies },
+  contact && { href: "#contacto", label: ui.nav.contact },
+].filter(Boolean) as { href: string; label: string }[];
+const social_links = [
+  ["LinkedIn", site_settings.linkedin_url, "linkedin_url"],
+  ["Facebook", site_settings.facebook_url, "facebook_url"],
+  ["Instagram", site_settings.instagram_url, "instagram_url"],
+  ["YouTube", site_settings.youtube_url, "youtube_url"],
+].filter(([, url]) => editing || url);
+const settings_target = (field: string) => ["site_settings", null, field] as [string, null, string];
+const current_year = new Date().getFullYear();
+---
+
+<div class="color_bar" aria-hidden="true"><span class="accent_yellow"></span><span class="accent_green"></span><span class="accent_blue"></span></div>
+<footer class="site_footer">
+  <div class="wrap">
+    <div class="footer_grid">
+      <div>
+        <SiteLogo site_settings={site_settings} href={home_path(language)} label={ui.home_aria} variant="dark_background" class="footer_logo" editing={editing} />
+        {(editing || site_settings.footer_tagline) && (
+          <p class="tagline" {...edit_text(editing, settings_target("footer_tagline"), { placeholder: "Frase del footer" })}>{site_settings.footer_tagline}</p>
+        )}
+        {
+          social_links.length > 0 && (
+            <ul class="social_links" aria-label={ui.footer.social_aria}>
+              {social_links.map(([name, url, field]) => (
+                <li>
+                  <a href={url || "#"} target="_blank" rel="noopener" class:list={{ is_empty_link: editing && !url }} {...edit_link(editing, settings_target(field))}>{name}</a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+      <div>
+        <h2>{ui.footer.company}</h2>
+        <ul>{company_links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>
+      </div>
+      {
+        services && services.items.length > 0 && (
+          <div>
+            <h2>{ui.footer.services}</h2>
+            <ul>{services.items.map((service) => <li><a href={`#servicio_${service.id}`}>{service.title}</a></li>)}</ul>
+          </div>
+        )
+      }
+      <div>
+        <h2>{ui.footer.contact}</h2>
+        <ul>
+          {site_settings.email && <li><a href={`mailto:${site_settings.email}`}>{site_settings.email}</a></li>}
+          {site_settings.phone_display && <li><a href={`tel:${site_settings.phone_link || site_settings.phone_display}`}>{site_settings.phone_display}</a></li>}
+          {site_settings.address && <li>{site_settings.address}</li>}
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      <span>© {current_year} {site_settings.company_name}</span>
+      {(editing || site_settings.business_hours) && (
+        <span {...edit_text(editing, settings_target("business_hours"), { placeholder: "Horario" })}>{site_settings.business_hours}</span>
+      )}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .color_bar { height: 6px; display: flex; }
+  .color_bar span { flex: 1; background: var(--accent); }
+  .site_footer { background: var(--base); color: var(--on_dark); padding: 72px 0 32px; font-size: 0.95rem; }
+  .footer_grid {
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px;
+    padding-bottom: 48px; border-bottom: 1px solid var(--base_2);
+  }
+  h2 { color: var(--paper); font: 600 0.8rem var(--sans); letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 16px; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  a { text-decoration: none; }
+  a:hover { color: var(--yellow); }
+  .footer_grid :global(.footer_logo) { display: inline-flex; margin-bottom: 20px; }
+  .tagline { max-width: 34ch; }
+  .is_empty_link { opacity: 0.45; text-decoration: line-through; }
+  .social_links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px; }
+  .copyright { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 24px; font-size: 0.85rem; color: #8796a3; }
+  @media (max-width: 860px) {
+    .footer_grid { grid-template-columns: 1fr 1fr; }
+    .footer_grid > div:first-child { grid-column: 1 / -1; }
+  }
+</style>

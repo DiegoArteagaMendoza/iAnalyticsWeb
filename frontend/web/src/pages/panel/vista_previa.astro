@@ -1,0 +1,32 @@
+---
+/** Página completa en modo edición. Se muestra dentro del iframe de /panel/editar. */
+import HomePage from "../../components/home_page.astro";
+import { get_preview_content } from "../../lib/content_api";
+import { is_language } from "../../lib/i18n";
+import type { PageContent } from "../../lib/types";
+
+const requested = Astro.url.searchParams.get("lang");
+const language = is_language(requested) ? requested : "es";
+
+let content: PageContent | null = null;
+let error_message = "";
+try {
+  content = await get_preview_content(language, Astro.locals.panel_token!);
+} catch (error) {
+  error_message = (error as Error).message;
+}
+---
+
+{
+  content ? (
+    <HomePage language={language} content={content} editing />
+  ) : (
+    <html lang="es-CL">
+      <head><meta charset="utf-8" /><title>Vista previa</title></head>
+      <body style="font-family: system-ui, sans-serif; padding: 48px; color: #12202b;">
+        <h1>No se pudo cargar la vista previa</h1>
+        <p>El backend no respondió ({error_message}). Revise que el servicio esté activo y recargue.</p>
+      </body>
+    </html>
+  )
+}

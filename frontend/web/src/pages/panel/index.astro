@@ -1,0 +1,115 @@
+---
+import PanelLayout from "../../layouts/panel_layout.astro";
+import { backend_request, django_admin_url } from "../../lib/panel_api";
+
+const user = Astro.locals.panel_user!;
+const token = Astro.locals.panel_token!;
+
+type ListResponse<T> = { count: number; results: T[] };
+type Message = { id: number; full_name: string; email: string; company: string; service_of_interest: string; message: string; created_at: string };
+type Publishable = { is_published: boolean };
+
+async function list<T>(path: string): Promise<ListResponse<T> | null> {
+  try {
+    const response = await backend_request(token, path);
+    return response.ok ? ((await response.json()) as ListResponse<T>) : null;
+  } catch {
+    return null;
+  }
+}
+
+const [unread, team, clients, services] = await Promise.all([
+  list<Message>("contact_messages/?is_read=false"),
+  list<Publishable>("team_members/"),
+  list<Publishable>("clients/"),
+  list<Publishable>("services/"),
+]);
+const published = (data: ListResponse<Publishable> | null) => data?.results.filter((item) => item.is_published).length ?? 0;
+const pending = [
+  { label: "Integrantes del equipo", data: team },
+  { label: "Clientes destacados", data: clients },
+  { label: "Servicios", data: services },
+].map((item) => ({ ...item, published: published(item.data), total: item.data?.count ?? 0 }));
+const date_format = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Santiago" });
+const first_name = user.full_name.split(/[\s@]/)[0];
+---
+
+<PanelLayout title="Inicio" active="inicio" user={user}>
+  <header class="panel_heading">
+    <h1>Hola, {first_name}</h1>
+    <p>Desde aquí puedes editar el contenido del sitio y revisar los mensajes recibidos.</p>
+  </header>
+
+  <section class="quick_actions" aria-label="Accesos rápidos">
+    <a class="action is_primary" href="/panel/editar?lang=es"><strong>✎ Editar la página</strong><span>Textos, fotos y elementos en español</span></a>
+    <a class="action" href="/panel/editar?lang=en"><strong>✎ Editar en inglés</strong><span>Revisar y corregir la traducción</span></a>
+    <a class="action" href="/" target="_blank" rel="noopener"><strong>↗ Ver sitio publicado</strong><span>Así lo ven los visitantes</span></a>
+  </section>
+
+  <div class="dashboard_grid">
+    <section class="panel_card">
+      <h2>Mensajes sin leer <span class="badge">{unread?.count ?? "—"}</span></h2>
+      {
+        unread && unread.results.length > 0 ? (
+          <ul class="messages">
+            {unread.results.slice(0, 5).map((message) => (
+              <li>
+                <a href={`${django_admin_url}contact/contactmessage/${message.id}/change/`} target="_blank" rel="noopener">
+                  <strong>{message.full_name}</strong>
+                  {message.company && <span> · {message.company}</span>}
+                  <small>{date_format.format(new Date(message.created_at))} · {message.service_of_interest || "Sin servicio"}</small>
+                  {message.message && <p>{message.message.slice(0, 140)}{message.message.length > 140 ? "…" : ""}</p>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty">{unread ? "No hay mensajes nuevos." : "No se pudieron cargar los mensajes."}</p>
+        )
+      }
+      <a class="link arrow" href={`${django_admin_url}contact/contactmessage/`} target="_blank" rel="noopener">Ver todos los mensajes</a>
+    </section>
+
+    <section class="panel_card">
+      <h2>Contenido publicado</h2>
+      <ul class="stats">
+        {
+          pending.map((item) => (
+            <li>
+              <span>{item.label}</span>
+              <strong>{item.published} <small>de {item.total}</small></strong>
+              <span class="bar" aria-hidden="true"><span style={`width: ${item.total ? (item.published / item.total) * 100 : 0}%`} /></span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="hint">Los elementos sin publicar se ven en "Editar" pero no en el sitio. Publícalos desde la barra que aparece sobre cada uno.</p>
+    </section>
+  </div>
+</PanelLayout>
+
+<style>
+  .quick_actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .action { display: grid; gap: 4px; padding: 20px; border-radius: 10px; background: var(--paper); text-decoration: none; box-shadow: 0 1px 3px rgba(18, 32, 43, 0.08); border: 2px solid transparent; transition: border-color var(--ease); }
+  .action:hover { border-color: var(--yellow); }
+  .action.is_primary { background: var(--yellow); }
+  .action strong { font-size: 1.05rem; }
+  .action span { color: var(--muted); font-size: 0.9rem; }
+  .action.is_primary span { color: var(--base); }
+  .dashboard_grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: start; }
+  h2 { font: 600 1.1rem var(--sans); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .badge { background: var(--blue); color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 0.85rem; }
+  .messages { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+  .messages a { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; }
+  .messages a:hover { border-color: var(--blue); background: var(--blue_soft); }
+  .messages small { display: block; color: var(--muted); margin-top: 2px; }
+  .messages p { margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
+  .empty { color: var(--muted); margin-bottom: 16px; }
+  .stats { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 16px; }
+  .stats li { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+  .stats small { color: var(--muted); font-weight: 400; }
+  .bar { grid-column: 1 / -1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--green); }
+  .hint { font-size: 0.85rem; color: var(--muted); }
+  @media (max-width: 991px) { .dashboard_grid { grid-template-columns: 1fr; } }
+</style>

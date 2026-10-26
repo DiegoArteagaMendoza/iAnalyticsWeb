@@ -1,0 +1,18 @@
+# Lo que no debe entrar a la imagen del backend
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+dockerfile
+.dockerignore

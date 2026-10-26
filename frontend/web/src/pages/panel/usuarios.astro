@@ -1,0 +1,88 @@
+---
+import PanelLayout from "../../layouts/panel_layout.astro";
+import { backend_request, django_admin_url } from "../../lib/panel_api";
+
+const user = Astro.locals.panel_user!;
+type StaffUser = { id: number; username: string; email: string; full_name: string; is_superuser: boolean; is_active: boolean; last_login: string | null };
+
+let staff_users: StaffUser[] | null = null;
+try {
+  const response = await backend_request(Astro.locals.panel_token!, "auth/staff_users/");
+  if (response.ok) staff_users = await response.json();
+} catch {
+  staff_users = null;
+}
+const date_format = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Santiago" });
+---
+
+<PanelLayout title="Gestionar usuarios" active="usuarios" user={user}>
+  <header class="panel_heading">
+    <h1>Gestionar usuarios</h1>
+    <p>Los administradores se registran en el administrador de Django.</p>
+  </header>
+
+  <div class="users_grid">
+    <section class="panel_card">
+      <h2>Registrar un nuevo administrador</h2>
+      <ol class="steps">
+        <li>Abre el formulario con el botón de abajo (se abre en una pestaña nueva).</li>
+        <li>Escribe el <strong>nombre de usuario</strong> (puede ser el correo) y una <strong>contraseña</strong>, y presiona <em>Guardar y continuar editando</em>.</li>
+        <li>En <em>Permisos</em>, marca <strong>Es staff</strong> para que pueda entrar a este panel.</li>
+        <li>Marca <strong>Es superusuario</strong> para darle acceso total, o asígnale solo los permisos que necesite.</li>
+        <li>Guarda. Ya puede ingresar en <code>/panel/ingresar</code>.</li>
+      </ol>
+      <div class="buttons">
+        <a class="btn btn_primary" href={`${django_admin_url}auth/user/add/`} target="_blank" rel="noopener">+ Registrar administrador</a>
+        <a class="btn btn_ghost_dark" href={`${django_admin_url}auth/user/`} target="_blank" rel="noopener">Ver todos los usuarios</a>
+      </div>
+      {!user.is_superuser && <p class="hint">Solo un superadministrador puede crear usuarios. Si no tienes acceso, pídeselo a uno.</p>}
+    </section>
+
+    <section class="panel_card">
+      <h2>Administradores actuales</h2>
+      {
+        staff_users ? (
+          <ul class="users">
+            {staff_users.map((staff) => (
+              <li class:list={{ is_inactive: !staff.is_active }}>
+                <span class="avatar" aria-hidden="true">{staff.full_name.slice(0, 1).toUpperCase()}</span>
+                <span>
+                  <strong>{staff.full_name}</strong>
+                  <small>
+                    {staff.is_superuser ? "Superadministrador" : "Administrador"}
+                    {!staff.is_active && " · inactivo"}
+                    {" · "}
+                    {staff.last_login ? `último ingreso ${date_format.format(new Date(staff.last_login))}` : "nunca ha ingresado"}
+                  </small>
+                </span>
+                <a href={`${django_admin_url}auth/user/${staff.id}/change/`} target="_blank" rel="noopener">Editar</a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="hint">No se pudo cargar la lista.</p>
+        )
+      }
+    </section>
+  </div>
+</PanelLayout>
+
+<style>
+  .users_grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  h2 { font: 600 1.1rem var(--sans); margin-bottom: 16px; }
+  .steps { margin: 0 0 20px; padding-left: 20px; display: grid; gap: 8px; color: var(--muted); }
+  .steps strong, .steps em { color: var(--base); }
+  .buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn { border-radius: 6px; }
+  .btn_ghost_dark { border-color: var(--base); color: var(--base); background: transparent; }
+  .btn_ghost_dark:hover { background: var(--base); color: var(--paper); }
+  .hint { margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
+  .users { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .users li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+  .users li.is_inactive { opacity: 0.55; }
+  .users strong { display: block; word-break: break-all; }
+  .users small { color: var(--muted); }
+  .users a { color: var(--blue); font-size: 0.88rem; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #fff; font-weight: 700; }
+  @media (max-width: 991px) { .users_grid { grid-template-columns: 1fr; } }
+</style>

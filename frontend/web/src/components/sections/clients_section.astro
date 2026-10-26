@@ -1,0 +1,180 @@
+---
+import { edit_image, edit_item, edit_link, edit_section, edit_text } from "../../lib/edit_attrs";
+import { get_ui, type Language } from "../../lib/i18n";
+import type { ClientsSection } from "../../lib/types";
+import SectionHeading from "../common/section_heading.astro";
+import EditAddButton from "../editor/edit_add_button.astro";
+
+interface Props {
+  clients: ClientsSection;
+  language: Language;
+  editing?: boolean;
+}
+
+const { clients, language, editing = false } = Astro.props;
+const ui = get_ui(language);
+const testimonial = clients.testimonials[0];
+const certification = clients.certifications[0];
+const show_heading = editing || clients.items.length > 0 || Boolean(testimonial);
+const show_trust = editing || Boolean(testimonial || certification);
+---
+
+<section
+  class="clients"
+  id="clientes"
+  aria-labelledby={show_heading ? "clients_title" : undefined}
+  {...edit_section(editing, "clients_section", clients.is_visible, "Clientes")}
+>
+  <div class="wrap">
+    {show_heading && <SectionHeading {...clients} eyebrow_color="green" heading_id="clients_title" editing={editing} endpoint="clients_section" />}
+
+    {
+      (editing || clients.items.length > 0) && (
+        <ul class="logos reveal" aria-label={ui.clients.logos_aria}>
+          {clients.items.map((client) => {
+            const logo = client.logo ? (
+              <img src={client.logo} alt={client.name} loading="lazy" />
+            ) : (
+              <span class={`logo_placeholder accent_${client.accent_color}`}><i aria-hidden="true" />{client.name}</span>
+            );
+            if (editing) {
+              return (
+                <li
+                  class="logo_cell is_editing"
+                  {...edit_item(editing, "clients", client.id, { is_published: client.is_published, accent_color: client.accent_color, label: "cliente" })}
+                >
+                  <div class="logo_frame" {...edit_image(editing, ["clients", client.id, "logo"], "Cambiar logo")}>
+                    {client.logo ? <img src={client.logo} alt={client.name} /> : <span class={`logo_placeholder accent_${client.accent_color}`}><i aria-hidden="true" /></span>}
+                  </div>
+                  <span class="client_name" {...edit_text(editing, ["clients", client.id, "name"], { translatable: false, placeholder: "Nombre del cliente" })}>{client.name}</span>
+                  <a class="client_link" href={client.website_url || "#"} {...edit_link(editing, ["clients", client.id, "website_url"])}>Sitio web</a>
+                </li>
+              );
+            }
+            return (
+              <li class="logo_cell">
+                {client.website_url ? <a href={client.website_url} target="_blank" rel="noopener">{logo}</a> : logo}
+              </li>
+            );
+          })}
+          {editing && (
+            <li class="logo_cell add_cell">
+              <EditAddButton endpoint="clients" label="Cliente" defaults={{ name: "Nuevo cliente", accent_color: "yellow", order: clients.items.length }} />
+            </li>
+          )}
+        </ul>
+      )
+    }
+
+    {
+      show_trust && (
+        <div class:list={["trust_grid", { single: !editing && (!testimonial || !certification) }]}>
+          {testimonial ? (
+            <figure
+              class="quote reveal"
+              {...edit_item(editing, "testimonials", testimonial.id, { is_published: testimonial.is_published, label: "testimonio" })}
+            >
+              <blockquote {...edit_text(editing, ["testimonials", testimonial.id, "quote"], { multiline: true, placeholder: "Testimonio" })}>{testimonial.quote}</blockquote>
+              <figcaption>
+                {editing ? (
+                  <cite>
+                    <span {...edit_text(editing, ["testimonials", testimonial.id, "author_name"], { translatable: false, placeholder: "Nombre" })}>{testimonial.author_name}</span>
+                    {" · "}
+                    <span {...edit_text(editing, ["testimonials", testimonial.id, "author_role"], { placeholder: "Cargo" })}>{testimonial.author_role}</span>
+                    {", "}
+                    <span {...edit_text(editing, ["testimonials", testimonial.id, "company_name"], { translatable: false, placeholder: "Empresa" })}>{testimonial.company_name}</span>
+                  </cite>
+                ) : (
+                  <cite>{[testimonial.author_name, [testimonial.author_role, testimonial.company_name].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}</cite>
+                )}
+              </figcaption>
+            </figure>
+          ) : (
+            editing && (
+              <EditAddButton
+                endpoint="testimonials"
+                label="Testimonio"
+                defaults={{ quote_es: "Testimonio del cliente sobre el trabajo realizado.", author_name: "Nombre", author_role_es: "Cargo", company_name: "Empresa", order: 0 }}
+              />
+            )
+          )}
+          {certification ? (
+            <div
+              class={`badge reveal accent_${certification.accent_color}`}
+              {...edit_item(editing, "certifications", certification.id, { is_published: certification.is_published, accent_color: certification.accent_color, label: "certificación" })}
+            >
+              <div class="badge_media" {...edit_image(editing, ["certifications", certification.id, "image"], "Imagen")}>
+                {certification.image ? (
+                  <img src={certification.image} alt="" loading="lazy" />
+                ) : (
+                  (editing || certification.badge_text) && (
+                    <div class="badge_text" {...edit_text(editing, ["certifications", certification.id, "badge_text"], { placeholder: "40 h" })}>{certification.badge_text}</div>
+                  )
+                )}
+              </div>
+              <div>
+                <p class="badge_title" {...edit_text(editing, ["certifications", certification.id, "title"], { placeholder: "Título" })}>{certification.title}</p>
+                {(editing || certification.issuer) && (
+                  <p {...edit_text(editing, ["certifications", certification.id, "issuer"], { placeholder: "Otorgada por" })}>{certification.issuer}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            editing && (
+              <EditAddButton
+                endpoint="certifications"
+                label="Certificación"
+                defaults={{ title_es: "Nueva certificación", badge_text_es: "✓", issuer_es: "Institución", accent_color: "green", order: 0 }}
+              />
+            )
+          )}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .clients { background: var(--surface); }
+  .logos {
+    list-style: none; padding: 0; margin: 0 0 56px;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);
+  }
+  .logo_cell { aspect-ratio: 3 / 2; background: var(--paper); display: grid; place-items: center; padding: 20px; transition: background var(--ease); }
+  .logo_cell:hover { background: var(--yellow_soft); }
+  .logo_cell a { display: grid; place-items: center; width: 100%; height: 100%; text-decoration: none; }
+  .logo_cell img { max-height: 56px; width: auto; object-fit: contain; filter: grayscale(1); opacity: 0.75; transition: filter var(--ease), opacity var(--ease); }
+  .logo_cell:hover img { filter: none; opacity: 1; }
+  .logo_placeholder { display: flex; align-items: center; gap: 8px; color: #9aa3aa; font: 700 1rem var(--sans); text-align: center; }
+  .logo_placeholder i { flex: 0 0 22px; height: 22px; border-radius: 50%; background: var(--accent); filter: grayscale(1); transition: filter var(--ease); }
+  .logo_cell:hover .logo_placeholder { color: var(--base); }
+  .logo_cell:hover .logo_placeholder i { filter: none; }
+
+  .trust_grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+  .trust_grid.single { grid-template-columns: minmax(0, 560px); }
+  .quote { margin: 0; background: var(--paper); padding: 48px 48px 48px 120px; position: relative; }
+  .quote::before { content: "“"; font-family: var(--serif); font-size: 6rem; line-height: 1; color: var(--yellow); position: absolute; top: 16px; left: 40px; }
+  blockquote { margin: 0 0 24px; font-family: var(--serif); font-size: 1.5rem; line-height: 1.4; }
+  cite { font-style: normal; color: var(--muted); font-size: 0.95rem; }
+  .badge { background: var(--accent); color: var(--paper); padding: 48px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+  .badge.accent_yellow { color: var(--base); }
+  .badge img { max-height: 96px; width: auto; align-self: flex-start; }
+  .badge_text { font-family: var(--serif); font-size: 4rem; line-height: 1; font-weight: 700; }
+  .badge_title { font-weight: 600; font-size: 1.15rem; margin-bottom: 8px; }
+  .badge p:not(.badge_title) { opacity: 0.9; }
+  @media (max-width: 991px) { .logos { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 860px) {
+    .trust_grid { grid-template-columns: 1fr; }
+    .quote, .badge { padding: 32px; }
+    .quote { padding-top: 96px; }
+    .quote::before { left: 24px; }
+  }
+  @media (max-width: 480px) { .logos { grid-template-columns: repeat(2, 1fr); } }
+  .logo_cell.is_editing { display: flex; flex-direction: column; gap: 8px; aspect-ratio: auto; min-height: 150px; }
+  .logo_frame { min-height: 56px; display: grid; place-items: center; }
+  .logo_cell.is_editing img { filter: none; opacity: 1; }
+  .client_name { font: 600 0.9rem var(--sans); text-align: center; }
+  .client_link { font-size: 0.75rem; color: var(--blue); }
+  .add_cell { padding: 12px; }
+  .add_cell :global(.edit_add_button) { height: 100%; }
+</style>
